@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Configurateur – location masses d’essai</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#0f1a2e; --muted:#9fb0d0; --text:#e9f0ff;
+      --line:rgba(255,255,255,.10); --accent:#7aa2ff; --good:#3ddc97; --warn:#ffce6b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#070c16, #0b1220 40%, #0b1220); color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    h1{margin:0 0 6px;font-size:28px;letter-spacing:-.02em}
+    p.sub{margin:0 0 18px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr;gap:16px}}
+    .card{background:rgba(15,26,46,.9); border:1px solid var(--line); border-radius:18px; padding:16px}
+    .row{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:520px){.row.two{grid-template-columns:1fr 1fr}}
+    label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
+    input,select{
+      width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(0,0,0,.25); color:var(--text); outline:none;
+    }
+    input::placeholder{color:rgba(233,240,255,.35)}
+    .pill{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .kpi{flex:1;min-width:170px;background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:16px;padding:12px}
+    .kpi .t{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:18px;font-weight:650;margin-top:4px}
+    .sep{height:1px;background:var(--line);margin:14px 0}
+    .table{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .thead,.trow{display:grid;grid-template-columns: 6fr 2fr 2fr 2fr;gap:10px;align-items:center}
+    .thead{background:rgba(255,255,255,.06);padding:10px 12px;font-size:12px;color:var(--muted)}
+    .trow{padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+    .right{text-align:right}
+    .note{font-size:12px;color:var(--muted)}
+    .warn{border:1px solid rgba(255,206,107,.35);background:rgba(255,206,107,.08);border-radius:16px;padding:10px 12px}
+    .good{border:1px solid rgba(61,220,151,.35);background:rgba(61,220,151,.08);border-radius:16px;padding:10px 12px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      padding:10px 12px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.06); color:var(--text); cursor:pointer
+    }
+    button:hover{border-color:rgba(255,255,255,.25)}
+    .big{font-size:22px;font-weight:750}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Configurateur – location masses d’essai</h1>
+    <p class="sub">Saisis la masse (kg), les dates, le département et le type d’essai. Le tarif + transport + préparation se calculent automatiquement.</p>
+
+    <div class="grid">
+      <!-- Paramètres -->
+      <div class="card">
+        <div class="row two">
+          <div>
+            <label for="masseKg">Masse totale demandée (kg)</label>
+            <input id="masseKg" inputmode="decimal" placeholder="Ex : 12000" />
+          </div>
+          <div>
+            <label for="typeEssai">Type d’essai</label>
+            <select id="typeEssai">
+              <option value="6M">6M</option>
+              <option value="9M">9M</option>
+              <option value="Complet" selected>Complet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row two" style="margin-top:10px">
+          <div>
+            <label for="dateDebut">Date début</label>
+            <input id="dateDebut" type="date" />
+          </div>
+          <div>
+            <label for="dateFin">Date fin</label>
+            <input id="dateFin" type="date" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="departement">Département de livraison</label>
+            <select id="departement"></select>
+          </div>
+        </div>
+
+        <div class="pill">
+          <div class="kpi">
+            <div class="t">Durée</div>
+            <div class="v" id="kpiDuree">—</div>
+            <div class="note">(inclusif, min 1 jour)</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Tarif</div>
+            <div class="v">0,05 €</div>
+            <div class="note">par kg / jour</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Minimum location</div>
+            <div class="v">250,00 €</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="btns">
+          <button id="resetBtn" type="button">Réinitialiser</button>
+        </div>
+
+        <div class="note" style="margin-top:10px">
+          Transport : tarif « aller simple » (grille) ×2 pour aller/retour. <br/>
+          Décomposition : calcule une préparation automatique dans la limite du stock.
+        </div>
+      </div>
+
+      <!-- Résultat -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div>
+            <div class="muted" style="font-size:12px">Total offre (HT)</div>
+            <div class="big" id="kpiTotal">—</div>
+          </div>
+          <div class="muted" id="resume" style="font-size:12px;max-width:520px;text-align:right"></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div id="alerts"></div>
+
+        <div style="margin-top:12px">
+          <div style="font-weight:650;margin-bottom:8px">Préparation (décomposition)</div>
+          <div class="table" id="prepTable">
+            <div class="thead">
+              <div>Type de masse</div>
+              <div class="right">Qté</div>
+              <div class="right">Unitaire</div>
+              <div class="right">Total</div>
+            </div>
+            <div id="prepRows"></div>
+            <div class="trow" style="background:rgba(255,255,255,.04)">
+              <div class="muted" style="grid-column:1 / span 3">Total préparé</div>
+              <div class="right" style="font-weight:700" id="prepTotal">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="kpi">
+            <div class="t">Location (brut)</div>
+            <div class="v" id="locBrut">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Location (min 250€ appliqué)</div>
+            <div class="v" id="locMin">—</div>
+          </div>
+        </div>
+
+        <div class="row two" style="margin-top:10px">
+          <div class="kpi">
+            <div class="t">Transport (aller simple)</div>
+            <div class="v" id="trAller">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Transport (aller/retour)</div>
+            <div class="v" id="trAR">—</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---- Données (issues de ton XLS + grille transport) ----
+  const TAUX_EUR_PAR_KG_PAR_JOUR = 0.05;
+  const MIN_LOCATION = 250;
+
+  // Poids unitaires (kg) + stock (dispo)
+  const MASSES = [
+    { ref: "orange", poidsKg: 2500, dispo: 8 },
+    { ref: "jaune", poidsKg: 2000, dispo: 1 },
+    { ref: "vert", poidsKg: 1000, dispo: 4 },
+    { ref: "rouge/marron", poidsKg: 500, dispo: 9 },
+    { ref: "bleu", poidsKg: 200, dispo: 3 },
+    { ref: "noir", poidsKg: 25, dispo: 26 },
+    { ref: "châssis (chaîne incluse)", poidsKg: 2500, dispo: 1 },
+    { ref: "petit timon", poidsKg: 56, dispo: 1 },
+    { ref: "grand timon", poidsKg: 200, dispo: 1 },
+  ].sort((a,b) => b.poidsKg - a.poidsKg);
+
+  // Transport (aller simple). Aller/retour = x2.
+  const TARIFS = {
+    "14": { "6M": 425, "9M": 495, "Complet": 525 },
+    "17": { "6M": 413, "9M": 480, "Complet": 512 },
+    "18": { "6M": 515, "9M": 600, "Complet": 656 },
+    "22": { "6M": 425, "9M": 485, "Complet": 512 },
+    "27": { "6M": 585, "9M": 620, "Complet": 695 },
+    "28": { "6M": 475, "9M": 500, "Complet": 523 },
+    "29": { "6M": 564, "9M": 612, "Complet": 650 },
+    "35": { "6M": 315, "9M": 370, "Complet": 400 },
+    "36": { "6M": 545, "9M": 612, "Complet": 645 },
+    "37": { "6M": 465, "9M": 490, "Complet": 511 },
+    "41": { "6M": 585, "9M": 612, "Complet": 623 },
+    "44": { "6M": 285, "9M": 315, "Complet": 335 },
+    "45": { "6M": 642, "9M": 685, "Complet": 702 },
+    "49": { "6M": 315, "9M": 355, "Complet": 395 },
+    "50 Nord": { "6M": 735, "9M": 785, "Complet": 812 },
+    "50 Sud": { "6M": 475, "9M": 495, "Complet": 511 },
+    "56": { "6M": 425, "9M": 485, "Complet": 512 },
+    "61": { "6M": 545, "9M": 595, "Complet": 610 },
+    "72": { "6M": 435, "9M": 495, "Complet": 513 },
+    "76": { "6M": 645, "9M": 685, "Complet": 735 },
+    "79": { "6M": 435, "9M": 465, "Complet": 495 },
+    "85": { "6M": 385, "9M": 401, "Complet": 425 },
+  };
+
+  // ---- Helpers ----
+  const EUR = (n) => (n==null || Number.isNaN(n)) ? "—" :
+    new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n);
+
+  const NF = (n) => (n==null || Number.isNaN(n)) ? "—" :
+    new Intl.NumberFormat("fr-FR",{maximumFractionDigits:0}).format(n);
+
+  function parseDateISO(s){
+    // input type=date => yyyy-mm-dd
+    if(!s) return null;
+    const [y,m,d] = s.split("-").map(x => parseInt(x,10));
+    if(!y||!m||!d) return null;
+    return new Date(Date.UTC(y,m-1,d));
+  }
+
+  function daysInclusive(startIso,endIso){
+    const s = parseDateISO(startIso);
+    const e = parseDateISO(endIso);
+    if(!s || !e) return null;
+    const msDay = 24*60*60*1000;
+    const diff = Math.floor((e - s)/msDay) + 1;
+    return Math.max(1,diff);
+  }
+
+  function computeDecomposition(masseDemandeeKg){
+    if(masseDemandeeKg == null) return { lignes:[], totalKg:0, ok:false };
+    let reste = Math.max(0, Math.round(masseDemandeeKg));
+    const lignes = [];
+
+    // Greedy du plus lourd au plus léger
+    for(const m of MASSES){
+      if(reste <= 0) break;
+      if(!m.dispo || m.dispo <= 0) continue;
+      const qte = Math.min(m.dispo, Math.floor(reste / m.poidsKg));
+      if(qte > 0){
+        const sousTotal = qte * m.poidsKg;
+        lignes.push({ ...m, qte, sousTotalKg:sousTotal });
+        reste -= sousTotal;
+      }
+    }
+
+    // Complète avec les plus petites (si reliquat)
+    if(reste > 0){
+      const asc = [...MASSES].sort((a,b)=>a.poidsKg - b.poidsKg);
+      for(const m of asc){
+        if(reste <= 0) break;
+        const deja = lignes.find(x=>x.ref===m.ref);
+        const dejaQte = deja ? deja.qte : 0;
+        const dispoRestante = Math.max(0, (m.dispo||0) - dejaQte);
+        if(dispoRestante <= 0) continue;
+
+        const qteAjout = Math.min(dispoRestante, Math.ceil(reste / m.poidsKg));
+        if(qteAjout > 0){
+          if(deja){
+            deja.qte += qteAjout;
+            deja.sousTotalKg += qteAjout * m.poidsKg;
+          } else {
+            lignes.push({ ...m, qte:qteAjout, sousTotalKg:qteAjout*m.poidsKg });
+          }
+          reste -= qteAjout * m.poidsKg;
+        }
+      }
+    }
+
+    const lignesTriees = lignes.filter(l=>l.qte>0).sort((a,b)=>b.poidsKg-a.poidsKg);
+    const totalKg = lignesTriees.reduce((s,l)=>s+l.sousTotalKg,0);
+    return { lignes:lignesTriees, totalKg, ok: totalKg >= Math.round(masseDemandeeKg) };
+  }
+
+  // ---- UI wiring ----
+  const els = {
+    masseKg: document.getElementById("masseKg"),
+    dateDebut: document.getElementById("dateDebut"),
+    dateFin: document.getElementById("dateFin"),
+    departement: document.getElementById("departement"),
+    typeEssai: document.getElementById("typeEssai"),
+    resetBtn: document.getElementById("resetBtn"),
+
+    kpiDuree: document.getElementById("kpiDuree"),
+    kpiTotal: document.getElementById("kpiTotal"),
+    resume: document.getElementById("resume"),
+
+    alerts: document.getElementById("alerts"),
+    prepRows: document.getElementById("prepRows"),
+    prepTotal: document.getElementById("prepTotal"),
+
+    locBrut: document.getElementById("locBrut"),
+    locMin: document.getElementById("locMin"),
+    trAller: document.getElementById("trAller"),
+    trAR: document.getElementById("trAR"),
+  };
+
+  // Populate départements
+  (function initDepartements(){
+    const keys = Object.keys(TARIFS);
+    els.departement.innerHTML = `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
+  })();
+
+  function getMasseKgNum(){
+    const v = String(els.masseKg.value ?? "").trim().replace(",", ".");
+    if(!v) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : null;
+  }
+
+  function render(){
+    const masse = getMasseKgNum();
+    const d1 = els.dateDebut.value;
+    const d2 = els.dateFin.value;
+    const dep = els.departement.value;
+    const type = els.typeEssai.value;
+
+    const jours = daysInclusive(d1,d2);
+
+    // alerts
+    const alerts = [];
+    if(d1 && d2){
+      const s = parseDateISO(d1), e = parseDateISO(d2);
+      if(s && e && e < s) alerts.push({kind:"warn", text:"La date de fin est avant la date de début."});
+    }
+    if(els.masseKg.value && masse == null) alerts.push({kind:"warn", text:"La masse doit être un nombre positif (en kg)."});
+    if(dep && !TARIFS[dep]) alerts.push({kind:"warn", text:"Département non trouvé dans la grille transport."});
+
+    els.alerts.innerHTML = alerts.map(a =>
+      `<div class="${a.kind === "warn" ? "warn" : "good"}" style="margin-bottom:8px">${a.text}</div>`
+    ).join("");
+
+    // durée
+    els.kpiDuree.textContent = (jours==null) ? "—" : `${jours} j`;
+
+    // location
+    const locBrut = (masse==null || jours==null) ? null : masse * TAUX_EUR_PAR_KG_PAR_JOUR * jours;
+    const locMin = (locBrut==null) ? null : Math.max(MIN_LOCATION, locBrut);
+
+    // transport
+    const trAller = (!dep || !TARIFS[dep]) ? null : (TARIFS[dep][type] ?? null);
+    const trAR = (trAller==null) ? null : trAller * 2;
+
+    // total
+    const total = (locMin==null || trAR==null) ? null : locMin + trAR;
+
+    els.locBrut.textContent = EUR(locBrut);
+    els.locMin.textContent  = EUR(locMin);
+    els.trAller.textContent = EUR(trAller);
+    els.trAR.textContent    = EUR(trAR);
+    els.kpiTotal.textContent= EUR(total);
+
+    // résumé
+    if(total==null){
+      els.resume.textContent = "Renseigne masse, dates et département pour obtenir un total.";
+    } else {
+      els.resume.textContent = `Pour ${NF(masse)} kg sur ${jours} jour(s) en ${dep} (${type})`;
+    }
+
+    // décomposition
+    const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false } : computeDecomposition(masse);
+    els.prepRows.innerHTML = plan.lignes.length === 0
+      ? `<div class="trow"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
+      : plan.lignes.map(l => `
+          <div class="trow">
+            <div>${l.ref}</div>
+            <div class="right" style="font-weight:650">${l.qte}</div>
+            <div class="right" style="color:rgba(233,240,255,.65)">${NF(l.poidsKg)} kg</div>
+            <div class="right" style="font-weight:650">${NF(l.sousTotalKg)} kg</div>
+          </div>
+        `).join("");
+
+    els.prepTotal.textContent = (masse==null) ? "—" : `${NF(plan.totalKg)} kg`;
+
+    // message stock
+    // (affiché en plus si masse saisie)
+    if(masse != null){
+      const delta = plan.totalKg - Math.round(masse);
+      const msg = plan.ok
+        ? `<div class="good" style="margin-top:10px">Objectif atteint. Surplus : ${NF(delta)} kg.</div>`
+        : `<div class="warn" style="margin-top:10px"><b>Attention :</b> stock insuffisant pour atteindre ${NF(masse)} kg.</div>`;
+      // place sous alertes
+      els.alerts.innerHTML = els.alerts.innerHTML + msg;
+    }
+  }
+
+  ["input","change"].forEach(evt=>{
+    els.masseKg.addEventListener(evt,render);
+    els.dateDebut.addEventListener(evt,render);
+    els.dateFin.addEventListener(evt,render);
+    els.departement.addEventListener(evt,render);
+    els.typeEssai.addEventListener(evt,render);
+  });
+
+  els.resetBtn.addEventListener("click", () => {
+    els.masseKg.value = "";
+    els.dateDebut.value = "";
+    els.dateFin.value = "";
+    els.departement.value = "";
+    els.typeEssai.value = "Complet";
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
