@@ -1,260 +1,868 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Configurateur – location masses d’essai</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Configurateur – location masses d’essai</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --card:#ffffff;
+      --muted:#5b6475;
+      --text:#0f172a;
+      --line:rgba(2,6,23,.12);
+      --accent:#2563eb;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --danger:#dc2626;
+      --soft:#f3f4f6;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#ffffff, #f8fafc 60%, #ffffff);
+      color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    .wrap{max-width:1400px;margin:0 auto;padding:18px}
+    h1{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}
+    p.sub{margin:0 0 14px;color:var(--muted);max-width:1100px}
 
-<style>
-:root{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --line:#e5e7eb;
-  --text:#0f172a;
-  --muted:#64748b;
-  --accent:#2563eb;
-  --good:#16a34a;
-  --warn:#f59e0b;
-  --danger:#dc2626;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  color:var(--text);
-}
-.wrap{max-width:1600px;margin:auto;padding:18px}
-h1{margin:0 0 6px;font-size:26px}
-.sub{color:var(--muted);margin-bottom:14px;max-width:1200px}
+    /* Layout global : 3 colonnes desktop (params / résultat / réservations) */
+    .layout{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:1200px){
+      .layout{
+        grid-template-columns: 360px minmax(520px, 1fr) 420px;
+        align-items:start;
+      }
+    }
 
-/* ====== LAYOUT ====== */
-.layout{
-  display:grid;
-  gap:16px;
-}
-@media(min-width:1200px){
-  .layout{
-    grid-template-columns: 360px 520px 480px;
-    align-items:start;
-  }
-}
-@media(max-width:1199px){
-  .layout{
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media(max-width:900px){
-  .layout{
-    grid-template-columns: 1fr;
-  }
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 10px 30px rgba(2,6,23,.06);
+    }
 
-/* ====== CARDS ====== */
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:14px;
-  box-shadow:0 8px 24px rgba(0,0,0,.05);
-}
+    .row{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:520px){.row.two{grid-template-columns:1fr 1fr}}
 
-/* ====== FORM ====== */
-label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-input,select{
-  width:100%;
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid var(--line);
-}
-.row{display:grid;gap:10px}
-.row.two{grid-template-columns:1fr 1fr}
-.sep{height:1px;background:var(--line);margin:12px 0}
+    label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
+    input,select{
+      width:100%; padding:10px 12px; border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff; color:var(--text); outline:none;
+    }
+    input:focus,select:focus{border-color:rgba(37,99,235,.5); box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+    input::placeholder{color:rgba(15,23,42,.35)}
 
-/* ====== KPI ====== */
-.kpi{
-  background:#f1f5f9;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:10px;
-}
-.kpi .t{font-size:12px;color:var(--muted)}
-.kpi .v{font-size:18px;font-weight:800}
+    .pill{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .kpi{
+      flex:1;min-width:170px;background:var(--soft);
+      border:1px solid var(--line);border-radius:14px;padding:12px
+    }
+    .kpi .t{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:18px;font-weight:850;margin-top:4px}
 
-/* ====== TABLES ====== */
-.table{border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.thead,.trow{
-  display:grid;
-  gap:8px;
-  padding:8px 10px;
-  align-items:center;
-}
-.thead{
-  background:#f8fafc;
-  font-size:12px;
-  color:var(--muted);
-}
-.trow{border-top:1px solid var(--line);font-size:14px}
+    .sep{height:1px;background:var(--line);margin:12px 0}
 
-/* Spécifique réservations */
-.thead.loc,.trow.loc{
-  grid-template-columns: 1fr 90px 90px 90px 80px 40px;
-}
-.affaire{
-  font-weight:800;
-  line-height:1.2;
-  max-height:2.4em;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-}
-.date{white-space:nowrap;font-variant-numeric:tabular-nums}
-.num{white-space:nowrap;text-align:right}
+    .table{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    .thead,.trow{display:grid;gap:10px;align-items:center}
+    .thead{background:#f8fafc;padding:9px 10px;font-size:12px;color:var(--muted)}
+    .trow{padding:9px 10px;border-top:1px solid var(--line);font-size:14px}
+    .right{text-align:right}
 
-/* ====== BUTTONS ====== */
-button{
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  background:#fff;
-  cursor:pointer;
-}
-.primary{
-  background:var(--accent);
-  color:#fff;
-  border-color:var(--accent);
-}
-.dangerBtn{
-  border-color:#fca5a5;
-  color:#dc2626;
-}
+    .thead.stock,.trow.stock{grid-template-columns: 5fr 2fr 2fr 2fr 1fr}
+    .thead.prep,.trow.prep{grid-template-columns: 6fr 2fr 2fr 2fr}
+    .thead.loc,.trow.loc{
+      grid-template-columns: 2.2fr 1.3fr 1.3fr 1.2fr 1fr 46px;
+      gap:8px;
+    }
 
-/* ====== STICKY ====== */
-.sticky{position:sticky;top:16px}
+    .note{font-size:12px;color:var(--muted);line-height:1.35}
+    .warn{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.10);border-radius:14px;padding:10px 12px}
+    .good{border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,.10);border-radius:14px;padding:10px 12px}
+    .danger{border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.08);border-radius:14px;padding:10px 12px}
 
-/* ====== SCROLL INTERNE ====== */
-.scroll{
-  max-height:70vh;
-  overflow:auto;
-}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      padding:10px 12px;border-radius:12px;border:1px solid var(--line);
+      background:#fff; color:var(--text); cursor:pointer
+    }
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    button.primary:hover{filter:brightness(.95)}
+    button.dangerBtn{background:#fff;border-color:rgba(220,38,38,.35);color:var(--danger)}
+    button.dangerBtn:hover{border-color:rgba(220,38,38,.60)}
 
-/* ====== BADGES ====== */
-.badge{
-  font-size:11px;
-  padding:4px 8px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--muted);
-}
-</style>
+    .big{font-size:22px;font-weight:950}
+    .muted{color:var(--muted)}
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      border:1px solid var(--line); background:#fff; border-radius:999px;
+      padding:6px 10px; font-size:12px; color:var(--muted)
+    }
+
+    /* --- Sticky réservations à droite --- */
+    .sticky{position:sticky; top:14px}
+
+    /* --- IMPORTANT : Résultats visibles sans scroller la page --- */
+    @media(min-width:1200px){
+      .resultPanel{
+        position: sticky;
+        top: 14px;
+        max-height: calc(100vh - 28px); /* hauteur écran */
+        overflow: auto;                 /* scroll interne */
+        padding-right: 6px;
+      }
+      .resultPanel::-webkit-scrollbar{ width:10px; }
+      .resultPanel::-webkit-scrollbar-thumb{
+        background:rgba(2,6,23,.18);
+        border-radius:999px;
+        border:3px solid rgba(255,255,255,.7);
+      }
+    }
+
+    /* --- Scroll interne réservations --- */
+    .scrollBox{
+      max-height: calc(100vh - 170px);
+      overflow:auto;
+    }
+    .scrollBox::-webkit-scrollbar{ width:10px; }
+    .scrollBox::-webkit-scrollbar-thumb{
+      background:rgba(2,6,23,.18);
+      border-radius:999px;
+      border:3px solid rgba(255,255,255,.7);
+    }
+
+    /* Dates en une ligne, style compact */
+    .dateCell{white-space:nowrap; font-variant-numeric: tabular-nums}
+    .affaireCell{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .massCell{white-space:nowrap}
+    .typeCell{white-space:nowrap}
+
+    /* Petites améliorations visuelles */
+    .sectionTitle{font-weight:900;margin-bottom:8px}
+    .sectionTitle small{font-weight:600;color:var(--muted)}
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<h1>Configurateur – location masses d’essai</h1>
-<p class="sub">
-Calcul automatique : jours ouvrés (week-end exclu), location, transport, préparation, manutention et stock réel selon réservations.
-</p>
+  <div class="wrap">
+    <h1>Configurateur – location masses d’essai</h1>
+    <p class="sub">
+      Calcul automatique : <b>jours ouvrés</b> (week-end exclu), location (tarif modifiable), transport, préparation + manutention, stock dispo selon les réservations enregistrées.
+    </p>
 
-<div class="layout">
+    <div class="layout">
 
-<!-- PARAMÈTRES -->
-<div class="card">
-  <label>Masse totale demandée (kg)</label>
-  <input placeholder="Ex : 12000"/>
+      <!-- PARAMÈTRES -->
+      <div class="card">
+        <div class="row two">
+          <div>
+            <label for="masseKg">Masse totale demandée (kg)</label>
+            <input id="masseKg" inputmode="decimal" placeholder="Ex : 12000" />
+          </div>
+          <div>
+            <label for="typeCamion">Type de camion</label>
+            <select id="typeCamion">
+              <option value="6M">6M</option>
+              <option value="9M">9M</option>
+              <option value="Complet" selected>Complet</option>
+            </select>
+          </div>
+        </div>
 
-  <div class="row two" style="margin-top:10px">
-    <div>
-      <label>Type de camion</label>
-      <select><option>Complet</option></select>
-    </div>
-    <div>
-      <label>Tarif €/kg/jour</label>
-      <input value="0,05"/>
-    </div>
-  </div>
+        <div class="row two" style="margin-top:10px">
+          <div>
+            <label for="dateDebut">Date début</label>
+            <input id="dateDebut" type="date" />
+          </div>
+          <div>
+            <label for="dateFin">Date fin</label>
+            <input id="dateFin" type="date" />
+          </div>
+        </div>
 
-  <div class="row two" style="margin-top:10px">
-    <div>
-      <label>Date début</label>
-      <input type="date"/>
-    </div>
-    <div>
-      <label>Date fin</label>
-      <input type="date"/>
-    </div>
-  </div>
+        <div class="row two" style="margin-top:10px">
+          <div>
+            <label for="departement">Département de livraison</label>
+            <select id="departement"></select>
+          </div>
+          <div>
+            <label for="tarifKgJour">Tarif location (€/kg/jour)</label>
+            <input id="tarifKgJour" type="number" step="0.001" min="0" />
+          </div>
+        </div>
 
-  <label style="margin-top:10px">N° d’affaire</label>
-  <input placeholder="AFF-2025-014"/>
+        <div class="sep"></div>
 
-  <div class="sep"></div>
+        <div class="row">
+          <div>
+            <label for="affaire">N° d’affaire (obligatoire pour valider)</label>
+            <input id="affaire" placeholder="Ex : AFF-2025-014" />
+          </div>
+        </div>
 
-  <div class="kpi">
-    <div class="t">Durée (jours ouvrés)</div>
-    <div class="v">—</div>
-  </div>
+        <div class="pill">
+          <div class="kpi">
+            <div class="t">Durée (jours ouvrés)</div>
+            <div class="v" id="kpiDuree">—</div>
+            <div class="note">(Lun→Ven, inclusif, min 1)</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Minimum location</div>
+            <div class="v">250,00 €</div>
+            <div class="note">forfait mini</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Manutention (auto)</div>
+            <div class="v"><span class="badge" id="kpiManut">—</span></div>
+            <div class="note">≤10t / 10–20t / >20t</div>
+          </div>
+        </div>
 
-  <div class="sep"></div>
+        <div class="sep"></div>
 
-  <button class="primary" style="width:100%">Valider / enregistrer</button>
-</div>
+        <div class="btns">
+          <button id="resetBtn" type="button">Réinitialiser</button>
+          <button id="saveBtn" type="button" class="primary">Valider / enregistrer</button>
+        </div>
 
-<!-- RÉSULTATS -->
-<div class="card sticky scroll">
-  <div class="kpi">
-    <div class="t">Total offre (HT)</div>
-    <div class="v">—</div>
-  </div>
-
-  <div class="sep"></div>
-
-  <div class="table">
-    <div class="thead">
-      <div>Stock / préparation / coûts</div>
-    </div>
-    <div class="trow">Contenu calculé…</div>
-  </div>
-
-  <div class="sep"></div>
-
-  <div class="kpi"><div class="t">Location</div><div class="v">—</div></div>
-  <div class="kpi"><div class="t">Transport A/R</div><div class="v">—</div></div>
-</div>
-
-<!-- RÉSERVATIONS -->
-<div class="card sticky">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <strong>Locations enregistrées</strong>
-    <button class="dangerBtn">Tout effacer</button>
-  </div>
-
-  <div class="sep"></div>
-
-  <div class="table scroll">
-    <div class="thead loc">
-      <div>N° affaire</div><div>Début</div><div>Fin</div>
-      <div class="num">Masse</div><div>Type</div><div></div>
-    </div>
-
-    <div class="trow loc">
-      <div class="affaire" title="AFF-2025-ESSAI-CHANTIER-CLIENT-XYZ">
-        AFF-2025-ESSAI-CHANTIER-CLIENT-XYZ
+        <div class="note" style="margin-top:10px">
+          Les locations sont enregistrées sur ce poste (LocalStorage). Le stock “dispo” se met à jour automatiquement selon les chevauchements.
+        </div>
       </div>
-      <div class="date">15/12/2025</div>
-      <div class="date">18/12/2025</div>
-      <div class="num">18 750</div>
-      <div>Complet</div>
-      <div><button class="dangerBtn">✕</button></div>
+
+      <!-- RESULTATS (sticky + scroll interne) -->
+      <div class="card resultPanel">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div>
+            <div class="muted" style="font-size:12px">Total offre (HT)</div>
+            <div class="big" id="kpiTotal">—</div>
+          </div>
+          <div class="muted" id="resume" style="font-size:12px;max-width:560px;text-align:right"></div>
+        </div>
+
+        <div class="sep"></div>
+        <div id="alerts"></div>
+
+        <div style="margin-top:12px">
+          <div class="sectionTitle">Stock dispo sur la période <small>(réservations déduites)</small></div>
+          <div class="table">
+            <div class="thead stock">
+              <div>Type</div>
+              <div class="right">Stock</div>
+              <div class="right">Réservé</div>
+              <div class="right">Dispo</div>
+              <div class="right">OK</div>
+            </div>
+            <div id="stockRows"></div>
+          </div>
+          <div class="note" style="margin-top:8px">
+            “Réservé” = total des locations enregistrées qui chevauchent tes dates.
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div style="margin-top:12px">
+          <div class="sectionTitle">Préparation <small>(décomposition + manutention auto)</small></div>
+          <div class="table" id="prepTable">
+            <div class="thead prep">
+              <div>Type de masse</div>
+              <div class="right">Qté</div>
+              <div class="right">Unitaire</div>
+              <div class="right">Total</div>
+            </div>
+            <div id="prepRows"></div>
+            <div class="trow prep" style="background:#f8fafc">
+              <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
+              <div class="right" style="font-weight:950" id="prepTotal">—</div>
+            </div>
+          </div>
+          <div id="prepMsg" style="margin-top:10px"></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <!-- ICI : la partie que tu ne voyais pas => maintenant accessible via scroll interne du panneau -->
+        <div class="row">
+          <div class="kpi">
+            <div class="t">Location (brut)</div>
+            <div class="v" id="locBrut">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Location (min 250€ appliqué)</div>
+            <div class="v" id="locMin">—</div>
+          </div>
+        </div>
+
+        <div class="row two" style="margin-top:10px">
+          <div class="kpi">
+            <div class="t">Transport (aller simple)</div>
+            <div class="v" id="trAller">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Transport (aller/retour)</div>
+            <div class="v" id="trAR">—</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="note">
+          Astuce : sur PC, ce panneau “Résultats” reste visible et scrolle dans lui-même (pas besoin de scroller la page).
+        </div>
+      </div>
+
+      <!-- RESERVATIONS (sticky + dates compactes) -->
+      <div class="card sticky">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:900">Locations enregistrées</div>
+            <div class="note">Toujours visible · scroll dans la liste</div>
+          </div>
+          <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="scrollBox">
+          <div class="table">
+            <div class="thead loc">
+              <div>N° affaire</div>
+              <div>Début</div>
+              <div>Fin</div>
+              <div class="right">Masse</div>
+              <div class="right">Type</div>
+              <div class="right">Suppr.</div>
+            </div>
+            <div id="locRows"></div>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:10px">
+          Les dates sont affichées en format JJ/MM/AAAA pour une lecture plus rapide.
+        </div>
+      </div>
+
     </div>
-
   </div>
-</div>
 
-</div>
-</div>
+<script>
+  // ======= PARAMÈTRES =======
+  const STORAGE_KEY = "masses_locations_v1";
+  const MIN_LOCATION = 250;
+
+  // Stock (issu de ton XLS) : poids unitaires (kg) + quantité totale
+  const MASSES = [
+    { ref: "orange", poidsKg: 2500, dispo: 8 },
+    { ref: "jaune", poidsKg: 2000, dispo: 1 },
+    { ref: "vert", poidsKg: 1000, dispo: 4 },
+    { ref: "rouge/marron", poidsKg: 500, dispo: 9 },
+    { ref: "bleu", poidsKg: 200, dispo: 3 },
+    { ref: "noir", poidsKg: 25, dispo: 26 },
+    { ref: "châssis (chaîne incluse)", poidsKg: 2500, dispo: 1 },
+    { ref: "petit timon", poidsKg: 56, dispo: 1 },   // timon 10t
+    { ref: "grand timon", poidsKg: 200, dispo: 1 },  // timon 20t
+  ];
+
+  // Transport (aller simple). Aller/retour = x2. Colonnes = type de camion.
+  const TARIFS = {
+    "14": { "6M": 425, "9M": 495, "Complet": 525 },
+    "17": { "6M": 413, "9M": 480, "Complet": 512 },
+    "18": { "6M": 515, "9M": 600, "Complet": 656 },
+    "22": { "6M": 425, "9M": 485, "Complet": 512 },
+    "27": { "6M": 585, "9M": 620, "Complet": 695 },
+    "28": { "6M": 475, "9M": 500, "Complet": 523 },
+    "29": { "6M": 564, "9M": 612, "Complet": 650 },
+    "35": { "6M": 315, "9M": 370, "Complet": 400 },
+    "36": { "6M": 545, "9M": 612, "Complet": 645 },
+    "37": { "6M": 465, "9M": 490, "Complet": 511 },
+    "41": { "6M": 585, "9M": 612, "Complet": 623 },
+    "44": { "6M": 285, "9M": 315, "Complet": 335 },
+    "45": { "6M": 642, "9M": 685, "Complet": 702 },
+    "49": { "6M": 315, "9M": 355, "Complet": 395 },
+    "50 Nord": { "6M": 735, "9M": 785, "Complet": 812 },
+    "50 Sud": { "6M": 475, "9M": 495, "Complet": 511 },
+    "56": { "6M": 425, "9M": 485, "Complet": 512 },
+    "61": { "6M": 545, "9M": 595, "Complet": 610 },
+    "72": { "6M": 435, "9M": 495, "Complet": 513 },
+    "76": { "6M": 645, "9M": 685, "Complet": 735 },
+    "79": { "6M": 435, "9M": 465, "Complet": 495 },
+    "85": { "6M": 385, "9M": 401, "Complet": 425 },
+  };
+
+  // ======= STORAGE =======
+  function loadLocations(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+  function saveLocations(arr){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  // ======= HELPERS =======
+  const EUR = (n) => (n==null || Number.isNaN(n)) ? "—" :
+    new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n);
+
+  const NF = (n) => (n==null || Number.isNaN(n)) ? "—" :
+    new Intl.NumberFormat("fr-FR",{maximumFractionDigits:0}).format(n);
+
+  const NF2 = (n) => (n==null || Number.isNaN(n)) ? "—" :
+    new Intl.NumberFormat("fr-FR",{maximumFractionDigits:2}).format(n);
+
+  function parseDateISO(s){
+    if(!s) return null;
+    const [y,m,d] = s.split("-").map(x => parseInt(x,10));
+    if(!y||!m||!d) return null;
+    return new Date(Date.UTC(y,m-1,d));
+  }
+
+  function fmtDateFR(iso){
+    // iso yyyy-mm-dd -> dd/mm/yyyy
+    const d = parseDateISO(iso);
+    if(!d) return "—";
+    const dd = String(d.getUTCDate()).padStart(2,"0");
+    const mm = String(d.getUTCMonth()+1).padStart(2,"0");
+    const yy = String(d.getUTCFullYear());
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  function overlaps(aStart, aEnd, bStart, bEnd){
+    return !(aEnd < bStart || aStart > bEnd); // inclusif
+  }
+
+  // Jours ouvrés (week-end exclu)
+  function businessDaysInclusive(startIso, endIso){
+    const s = parseDateISO(startIso);
+    const e = parseDateISO(endIso);
+    if(!s || !e) return null;
+    if(e < s) return null;
+
+    let count = 0;
+    const d = new Date(s.getTime());
+    while(d <= e){
+      const dow = d.getUTCDay(); // 0=Dim, 6=Sam
+      if(dow !== 0 && dow !== 6) count++;
+      d.setUTCDate(d.getUTCDate() + 1);
+    }
+    return Math.max(1, count);
+  }
+
+  // Manutention auto selon masse
+  function requiredHandlingItems(masseKg){
+    if(masseKg == null) return { label: "—", items:{} };
+    const t = masseKg / 1000;
+    if(t <= 10){
+      return { label: "≤10t : petit timon (10t)", items: { "petit timon": 1 } };
+    }
+    if(t <= 20){
+      return { label: "10–20t : grand timon (20t)", items: { "grand timon": 1 } };
+    }
+    return { label: ">20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
+  }
+
+  function getReservedMap(startIso, endIso){
+    const s = parseDateISO(startIso);
+    const e = parseDateISO(endIso);
+    const reserved = Object.create(null);
+    if(!s || !e || e < s) return reserved;
+
+    const locations = loadLocations();
+    for(const r of locations){
+      const rs = parseDateISO(r.start);
+      const re = parseDateISO(r.end);
+      if(!rs || !re) continue;
+      if(!overlaps(s, e, rs, re)) continue;
+
+      for(const [ref, qty] of Object.entries(r.items || {})){
+        reserved[ref] = (reserved[ref] || 0) + (Number(qty) || 0);
+      }
+    }
+    return reserved;
+  }
+
+  function getAvailableMasses(startIso, endIso){
+    const reserved = getReservedMap(startIso, endIso);
+    return MASSES
+      .map(m => {
+        const res = reserved[m.ref] || 0;
+        const dispo = Math.max(0, (m.dispo || 0) - res);
+        return { ...m, reserved: res, dispoRestante: dispo };
+      })
+      .sort((a,b)=> b.poidsKg - a.poidsKg);
+  }
+
+  function computeDecomposition(masseDemandeeKg, massesDisponibles, handlingItems){
+    if(masseDemandeeKg == null) return { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] };
+
+    // 1) Réserve la manutention en priorité (déduit du stock restant)
+    const mapAvail = new Map(massesDisponibles.map(m => [m.ref, { ...m }]));
+    const handlingLines = [];
+    let handlingOk = true;
+
+    for(const [ref, qty] of Object.entries(handlingItems || {})){
+      const m = mapAvail.get(ref);
+      const dispo = m ? (m.dispoRestante ?? 0) : 0;
+      if(dispo < qty) handlingOk = false;
+      if(m) m.dispoRestante = Math.max(0, dispo - qty);
+
+      const poidsKg = m ? m.poidsKg : 0;
+      handlingLines.push({ ref, qte: qty, poidsKg, sousTotalKg: qty * poidsKg, isHandling:true });
+    }
+
+    // 2) Décomposition des masses (hors manutention)
+    let reste = Math.max(0, Math.round(masseDemandeeKg));
+    const lignes = [];
+    const massesSorted = [...mapAvail.values()].sort((a,b)=>b.poidsKg - a.poidsKg);
+
+    for(const m of massesSorted){
+      if(reste <= 0) break;
+      const dispo = m.dispoRestante ?? 0;
+      if(dispo <= 0) continue;
+
+      const qte = Math.min(dispo, Math.floor(reste / m.poidsKg));
+      if(qte > 0){
+        const sousTotal = qte * m.poidsKg;
+        lignes.push({ ref:m.ref, poidsKg:m.poidsKg, qte, sousTotalKg:sousTotal, isHandling:false });
+        reste -= sousTotal;
+        m.dispoRestante -= qte;
+      }
+    }
+
+    if(reste > 0){
+      const asc = [...massesSorted].sort((a,b)=>a.poidsKg - b.poidsKg);
+      for(const m of asc){
+        if(reste <= 0) break;
+        const dispo = m.dispoRestante ?? 0;
+        if(dispo <= 0) continue;
+
+        const qteAjout = Math.min(dispo, Math.ceil(reste / m.poidsKg));
+        if(qteAjout > 0){
+          const deja = lignes.find(x=>x.ref===m.ref);
+          if(deja){
+            deja.qte += qteAjout;
+            deja.sousTotalKg += qteAjout * m.poidsKg;
+          } else {
+            lignes.push({ ref:m.ref, poidsKg:m.poidsKg, qte:qteAjout, sousTotalKg:qteAjout*m.poidsKg, isHandling:false });
+          }
+          reste -= qteAjout * m.poidsKg;
+          m.dispoRestante -= qteAjout;
+        }
+      }
+    }
+
+    const lignesTriees = lignes.filter(l=>l.qte>0).sort((a,b)=>b.poidsKg - a.poidsKg);
+    const totalKg = lignesTriees.reduce((s,l)=>s+l.sousTotalKg,0);
+
+    return {
+      lignes: lignesTriees,
+      totalKg,
+      ok: totalKg >= Math.round(masseDemandeeKg),
+      handlingOk,
+      handlingLines: handlingLines.filter(l=>l.qte>0),
+    };
+  }
+
+  function linesToItemsMap(lines){
+    const map = {};
+    for(const l of lines){
+      map[l.ref] = (map[l.ref] || 0) + (Number(l.qte) || 0);
+    }
+    return map;
+  }
+
+  // ======= UI =======
+  const els = {
+    masseKg: document.getElementById("masseKg"),
+    dateDebut: document.getElementById("dateDebut"),
+    dateFin: document.getElementById("dateFin"),
+    departement: document.getElementById("departement"),
+    typeCamion: document.getElementById("typeCamion"),
+    tarifKgJour: document.getElementById("tarifKgJour"),
+    affaire: document.getElementById("affaire"),
+
+    resetBtn: document.getElementById("resetBtn"),
+    saveBtn: document.getElementById("saveBtn"),
+
+    kpiDuree: document.getElementById("kpiDuree"),
+    kpiTotal: document.getElementById("kpiTotal"),
+    resume: document.getElementById("resume"),
+    kpiManut: document.getElementById("kpiManut"),
+
+    alerts: document.getElementById("alerts"),
+    stockRows: document.getElementById("stockRows"),
+
+    prepRows: document.getElementById("prepRows"),
+    prepTotal: document.getElementById("prepTotal"),
+    prepMsg: document.getElementById("prepMsg"),
+
+    locBrut: document.getElementById("locBrut"),
+    locMin: document.getElementById("locMin"),
+    trAller: document.getElementById("trAller"),
+    trAR: document.getElementById("trAR"),
+
+    locRows: document.getElementById("locRows"),
+    clearAllBtn: document.getElementById("clearAllBtn"),
+  };
+
+  // Defaults
+  els.tarifKgJour.value = "0.05";
+
+  // Populate départements
+  (function initDepartements(){
+    const keys = Object.keys(TARIFS);
+    els.departement.innerHTML = `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
+  })();
+
+  function getMasseKgNum(){
+    const v = String(els.masseKg.value ?? "").trim().replace(",", ".");
+    if(!v) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : null;
+  }
+
+  function getTarifNum(){
+    const v = String(els.tarifKgJour.value ?? "").trim().replace(",", ".");
+    if(!v) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : null;
+  }
+
+  function renderLocationsList(){
+    const locs = loadLocations().slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+    if(locs.length === 0){
+      els.locRows.innerHTML = `<div class="trow loc"><div class="muted" style="grid-column:1 / span 6">—</div></div>`;
+      return;
+    }
+
+    els.locRows.innerHTML = locs.map(l => `
+      <div class="trow loc">
+        <div class="affaireCell" title="${l.affaire || ""}">${l.affaire || "—"}</div>
+        <div class="dateCell">${fmtDateFR(l.start)}</div>
+        <div class="dateCell">${fmtDateFR(l.end)}</div>
+        <div class="right massCell">${NF(l.masseKg)} kg</div>
+        <div class="right typeCell">${l.typeCamion || "—"}</div>
+        <div class="right">
+          <button class="dangerBtn" data-del="${l.id}" type="button">✕</button>
+        </div>
+      </div>
+    `).join("");
+
+    els.locRows.querySelectorAll("button[data-del]").forEach(btn=>{
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-del");
+        const next = loadLocations().filter(x => x.id !== id);
+        saveLocations(next);
+        render();
+      });
+    });
+  }
+
+  function render(){
+    const masse = getMasseKgNum();
+    const tarif = getTarifNum();
+    const d1 = els.dateDebut.value;
+    const d2 = els.dateFin.value;
+    const dep = els.departement.value;
+    const typeCamion = els.typeCamion.value;
+
+    const jours = businessDaysInclusive(d1, d2);
+    const manut = requiredHandlingItems(masse);
+    els.kpiManut.textContent = manut.label;
+
+    // Alerts
+    const alerts = [];
+    if(d1 && d2){
+      const s = parseDateISO(d1), e = parseDateISO(d2);
+      if(s && e && e < s) alerts.push({kind:"warn", text:"La date de fin est avant la date de début."});
+    }
+    if(els.masseKg.value && masse == null) alerts.push({kind:"warn", text:"La masse doit être un nombre positif (en kg)."});
+    if(els.tarifKgJour.value && tarif == null) alerts.push({kind:"warn", text:"Le tarif doit être un nombre positif."});
+    if(dep && !TARIFS[dep]) alerts.push({kind:"warn", text:"Département non trouvé dans la grille transport."});
+
+    els.alerts.innerHTML = alerts.map(a =>
+      `<div class="${a.kind === "warn" ? "warn" : "good"}" style="margin-bottom:8px">${a.text}</div>`
+    ).join("");
+
+    // Durée ouvrée
+    els.kpiDuree.textContent = (jours==null) ? "—" : `${jours} j`;
+
+    // Transport
+    const trAller = (!dep || !TARIFS[dep]) ? null : (TARIFS[dep][typeCamion] ?? null);
+    const trAR = (trAller==null) ? null : trAller * 2;
+
+    // Location
+    const locBrut = (masse==null || jours==null || tarif==null) ? null : masse * tarif * jours;
+    const locMin = (locBrut==null) ? null : Math.max(MIN_LOCATION, locBrut);
+
+    // Total
+    const total = (locMin==null || trAR==null) ? null : locMin + trAR;
+
+    document.getElementById("locBrut").textContent = EUR(locBrut);
+    document.getElementById("locMin").textContent  = EUR(locMin);
+    document.getElementById("trAller").textContent = EUR(trAller);
+    document.getElementById("trAR").textContent    = EUR(trAR);
+    document.getElementById("kpiTotal").textContent= EUR(total);
+
+    // Résumé
+    if(total==null){
+      document.getElementById("resume").textContent = "Renseigne masse, dates et département pour obtenir un total.";
+    } else {
+      document.getElementById("resume").textContent =
+        `Pour ${NF(masse)} kg sur ${jours} jour(s) ouvré(s) en ${dep} (${typeCamion}) · Tarif ${NF2(tarif)} €/kg/j`;
+    }
+
+    // Stock sur période (déduit locations enregistrées)
+    const massesDisponibles = getAvailableMasses(d1, d2);
+    els.stockRows.innerHTML = massesDisponibles.map(m => {
+      const ok = m.dispoRestante > 0;
+      return `
+        <div class="trow stock">
+          <div>${m.ref}</div>
+          <div class="right">${NF(m.dispo)}</div>
+          <div class="right">${NF(m.reserved)}</div>
+          <div class="right" style="font-weight:950">${NF(m.dispoRestante)}</div>
+          <div class="right" style="font-weight:950;color:${ok ? "var(--good)" : "var(--warn)"}">${ok ? "OK" : "0"}</div>
+        </div>
+      `;
+    }).join("");
+
+    // Décomposition (stock restant + manutention réservée)
+    const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] }
+                              : computeDecomposition(masse, massesDisponibles, manut.items);
+
+    const combined = [...(plan.handlingLines||[]), ...(plan.lignes||[])];
+    els.prepRows.innerHTML = combined.length === 0
+      ? `<div class="trow prep"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
+      : combined.map(l => `
+          <div class="trow prep">
+            <div>${l.ref}${l.isHandling ? ' <span class="badge" style="margin-left:8px">Manutention</span>' : ""}</div>
+            <div class="right" style="font-weight:950">${NF(l.qte)}</div>
+            <div class="right" style="color:rgba(15,23,42,.70)">${NF(l.poidsKg)} kg</div>
+            <div class="right" style="font-weight:950">${NF(l.sousTotalKg)} kg</div>
+          </div>
+        `).join("");
+
+    els.prepTotal.textContent = (masse==null) ? "—" : `${NF(plan.totalKg)} kg`;
+
+    els.prepMsg.innerHTML = "";
+    if(masse != null){
+      const delta = plan.totalKg - Math.round(masse);
+      let msg = plan.ok
+        ? `<div class="good">Objectif masses atteint. Surplus : ${NF(delta)} kg (stock restant pris en compte).</div>`
+        : `<div class="warn"><b>Attention :</b> stock insuffisant sur ces dates pour atteindre ${NF(masse)} kg (réservations déduites).</div>`;
+
+      if(!plan.handlingOk){
+        msg += `<div class="danger" style="margin-top:8px"><b>Manutention indisponible :</b> timon/châssis requis non disponible sur ces dates.</div>`;
+      }
+      els.prepMsg.innerHTML = msg;
+    }
+
+    renderLocationsList();
+  }
+
+  // Valider / enregistrer
+  document.getElementById("saveBtn").addEventListener("click", () => {
+    const affaire = String(document.getElementById("affaire").value || "").trim();
+    const masse = getMasseKgNum();
+    const tarif = getTarifNum();
+    const d1 = document.getElementById("dateDebut").value;
+    const d2 = document.getElementById("dateFin").value;
+    const dep = document.getElementById("departement").value;
+    const typeCamion = document.getElementById("typeCamion").value;
+
+    const jours = businessDaysInclusive(d1, d2);
+
+    if(!affaire){ alert("Merci de renseigner un N° d’affaire avant de valider."); return; }
+    if(masse == null || tarif == null || !d1 || !d2 || !dep){ alert("Merci de renseigner : masse, dates, département (et un tarif valide)."); return; }
+    if(jours == null){ alert("Dates invalides (fin avant début)."); return; }
+
+    const massesDisponibles = getAvailableMasses(d1, d2);
+    const manut = requiredHandlingItems(masse);
+    const plan = computeDecomposition(masse, massesDisponibles, manut.items);
+
+    if(!plan.ok){
+      if(!confirm("Le stock masses semble insuffisant sur ces dates. Enregistrer quand même ?")) return;
+    }
+    if(!plan.handlingOk){
+      if(!confirm("Manutention (timon/châssis) indisponible sur ces dates. Enregistrer quand même ?")) return;
+    }
+
+    const items = {
+      ...linesToItemsMap(plan.handlingLines || []),
+      ...linesToItemsMap(plan.lignes || []),
+    };
+
+    const locs = loadLocations();
+    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+    locs.push({
+      id,
+      affaire,
+      start: d1,
+      end: d2,
+      departement: dep,
+      typeCamion,
+      masseKg: Math.round(masse),
+      tarif,
+      joursOuvres: jours,
+      items,
+      createdAt: new Date().toISOString(),
+    });
+
+    saveLocations(locs);
+    document.getElementById("affaire").value = "";
+    render();
+    alert("Location enregistrée ✅ Stock mis à jour.");
+  });
+
+  // Tout effacer
+  document.getElementById("clearAllBtn").addEventListener("click", () => {
+    if(confirm("Supprimer TOUTES les locations enregistrées sur ce poste ?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+  });
+
+  // Reset
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    document.getElementById("masseKg").value = "";
+    document.getElementById("dateDebut").value = "";
+    document.getElementById("dateFin").value = "";
+    document.getElementById("departement").value = "";
+    document.getElementById("typeCamion").value = "Complet";
+    document.getElementById("tarifKgJour").value = "0.05";
+    document.getElementById("affaire").value = "";
+    render();
+  });
+
+  // Re-render on input
+  ["input","change"].forEach(evt=>{
+    document.getElementById("masseKg").addEventListener(evt,render);
+    document.getElementById("tarifKgJour").addEventListener(evt,render);
+    document.getElementById("dateDebut").addEventListener(evt,render);
+    document.getElementById("dateFin").addEventListener(evt,render);
+    document.getElementById("departement").addEventListener(evt,render);
+    document.getElementById("typeCamion").addEventListener(evt,render);
+  });
+
+  // Init départements + defaults
+  (function init(){
+    const keys = Object.keys(TARIFS);
+    document.getElementById("departement").innerHTML =
+      `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
+    document.getElementById("tarifKgJour").value = "0.05";
+    render();
+  })();
+</script>
+</body>
+</html>
+
 </body>
 </html>
