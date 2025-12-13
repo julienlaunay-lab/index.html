@@ -81,44 +81,33 @@
       border:1px solid var(--line); background:#fff; border-radius:999px;
       padding:6px 10px; font-size:12px; color:var(--muted)
     }
-    /* --- Amélioration lisibilité : panneau réservations visible --- */
-.rightCol {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
 
-/* Sur desktop : résultat à gauche, réservations à droite */
-@media (min-width: 1100px) {
-  .rightCol {
-    grid-template-columns: 1fr 420px;
-    align-items: start;
-  }
-}
-
-.sticky {
-  position: sticky;
-  top: 16px;
-}
-
-.scrollBox {
-  max-height: 58vh;        /* la liste scrolle dans son bloc */
-  overflow: auto;
-}
-
-.scrollBox::-webkit-scrollbar { width: 10px; }
-.scrollBox::-webkit-scrollbar-thumb {
-  background: rgba(2,6,23,.18);
-  border-radius: 999px;
-  border: 3px solid rgba(255,255,255,.7);
-}
-
+    /* --- Lisibilité : panneau réservations toujours visible --- */
+    .rightCol{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;
+    }
+    @media(min-width:1100px){
+      .rightCol{ grid-template-columns: 1fr 420px; align-items:start; }
+    }
+    .sticky{ position:sticky; top:16px; }
+    .scrollBox{ max-height:58vh; overflow:auto; }
+    .scrollBox::-webkit-scrollbar{ width:10px; }
+    .scrollBox::-webkit-scrollbar-thumb{
+      background:rgba(2,6,23,.18);
+      border-radius:999px;
+      border:3px solid rgba(255,255,255,.7);
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Configurateur – location masses d’essai</h1>
-    <p class="sub">Saisis la masse (kg), les dates, le département et le type de camion. Le tarif + transport + préparation + stock dispo se calculent automatiquement. Puis “Valider” pour réserver.</p>
+    <p class="sub">
+      Saisis la masse (kg), les dates, le département et le type de camion.
+      Calcul automatique : durée en jours ouvrés, location (tarif modifiable), transport, préparation + manutention, et stock dispo selon les réservations enregistrées.
+    </p>
 
     <div class="grid">
       <!-- Paramètres -->
@@ -183,7 +172,7 @@
           <div class="kpi">
             <div class="t">Manutention (auto)</div>
             <div class="v"><span class="badge" id="kpiManut">—</span></div>
-            <div class="note">selon ton seuil 10t / 20t</div>
+            <div class="note">≤10t / 10–20t / >20t</div>
           </div>
         </div>
 
@@ -195,102 +184,116 @@
         </div>
 
         <div class="note" style="margin-top:10px">
-          Les locations validées sont enregistrées dans ce navigateur (LocalStorage). Le stock “dispo” tient compte des chevauchements de dates.
+          Les locations validées sont enregistrées sur ce poste (LocalStorage). Le stock “dispo” est recalculé automatiquement en fonction des chevauchements de dates.
         </div>
       </div>
 
-      <!-- Résultat -->
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
-          <div>
-            <div class="muted" style="font-size:12px">Total offre (HT)</div>
-            <div class="big" id="kpiTotal">—</div>
-          </div>
-          <div class="muted" id="resume" style="font-size:12px;max-width:560px;text-align:right"></div>
-        </div>
+      <!-- Colonne droite : Résultats + Réservations toujours visibles -->
+      <div class="rightCol">
 
-        <div class="sep"></div>
-
-        <div id="alerts"></div>
-
-        <div style="margin-top:12px">
-          <div style="font-weight:850;margin-bottom:8px">Stock dispo sur la période (réservations déduites)</div>
-          <div class="table">
-            <div class="thead stock">
-              <div>Type</div>
-              <div class="right">Stock</div>
-              <div class="right">Réservé</div>
-              <div class="right">Dispo</div>
-              <div class="right">OK</div>
+        <!-- RESULTATS -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
+            <div>
+              <div class="muted" style="font-size:12px">Total offre (HT)</div>
+              <div class="big" id="kpiTotal">—</div>
             </div>
-            <div id="stockRows"></div>
+            <div class="muted" id="resume" style="font-size:12px;max-width:560px;text-align:right"></div>
           </div>
-          <div class="note" style="margin-top:8px">
-            “Réservé” = total des locations enregistrées qui chevauchent tes dates.
-          </div>
-        </div>
 
-        <div class="sep"></div>
+          <div class="sep"></div>
+          <div id="alerts"></div>
 
-        <div style="margin-top:12px">
-          <div style="font-weight:850;margin-bottom:8px">Préparation (décomposition + manutention auto)</div>
-          <div class="table" id="prepTable">
-            <div class="thead">
-              <div>Type de masse</div>
-              <div class="right">Qté</div>
-              <div class="right">Unitaire</div>
-              <div class="right">Total</div>
+          <div style="margin-top:12px">
+            <div style="font-weight:850;margin-bottom:8px">Stock dispo sur la période (réservations déduites)</div>
+            <div class="table">
+              <div class="thead stock">
+                <div>Type</div>
+                <div class="right">Stock</div>
+                <div class="right">Réservé</div>
+                <div class="right">Dispo</div>
+                <div class="right">OK</div>
+              </div>
+              <div id="stockRows"></div>
             </div>
-            <div id="prepRows"></div>
-            <div class="trow" style="background:#f8fafc">
-              <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
-              <div class="right" style="font-weight:950" id="prepTotal">—</div>
+            <div class="note" style="margin-top:8px">
+              “Réservé” = total des locations enregistrées qui chevauchent tes dates.
             </div>
           </div>
-          <div id="prepMsg" style="margin-top:10px"></div>
-        </div>
 
-        <div class="sep"></div>
+          <div class="sep"></div>
 
-        <div class="row">
-          <div class="kpi">
-            <div class="t">Location (brut)</div>
-            <div class="v" id="locBrut">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Location (min 250€ appliqué)</div>
-            <div class="v" id="locMin">—</div>
-          </div>
-        </div>
-
-        <div class="row two" style="margin-top:10px">
-          <div class="kpi">
-            <div class="t">Transport (aller simple)</div>
-            <div class="v" id="trAller">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Transport (aller/retour)</div>
-            <div class="v" id="trAR">—</div>
-          </div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div style="margin-top:12px">
-          <div style="font-weight:850;margin-bottom:8px">Locations enregistrées (ce poste)</div>
-          <div class="table">
-            <div class="thead loc">
-              <div>N° affaire</div>
-              <div>Début</div>
-              <div>Fin</div>
-              <div class="right">Masse</div>
-              <div class="right">Type</div>
-              <div class="right">Suppr.</div>
+          <div style="margin-top:12px">
+            <div style="font-weight:850;margin-bottom:8px">Préparation (décomposition + manutention auto)</div>
+            <div class="table" id="prepTable">
+              <div class="thead">
+                <div>Type de masse</div>
+                <div class="right">Qté</div>
+                <div class="right">Unitaire</div>
+                <div class="right">Total</div>
+              </div>
+              <div id="prepRows"></div>
+              <div class="trow" style="background:#f8fafc">
+                <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
+                <div class="right" style="font-weight:950" id="prepTotal">—</div>
+              </div>
             </div>
-            <div id="locRows"></div>
+            <div id="prepMsg" style="margin-top:10px"></div>
           </div>
-          <div class="note" style="margin-top:8px">
-            Pour une base partagée multi-collaborateurs, on branchera ensuite une source centralisée (Google Sheet / Airtable).
+
+          <div class="sep"></div>
+
+          <div class="row">
+            <div class="kpi">
+              <div class="t">Location (brut)</div>
+              <div class="v" id="locBrut">—</div>
+            </div>
+            <div class="kpi">
+              <div class="t">Location (min 250€ appliqué)</div>
+              <div class="v" id="locMin">—</div>
+            </div>
+          </div>
+
+          <div class="row two" style="margin-top:10px">
+            <div class="kpi">
+              <div class="t">Transport (aller simple)</div>
+              <div class="v" id="trAller">—</div>
+            </div>
+            <div class="kpi">
+              <div class="t">Transport (aller/retour)</div>
+              <div class="v" id="trAR">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESERVATIONS (Sticky + scroll interne) -->
+        <div class="card sticky">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:850">Locations enregistrées</div>
+              <div class="note">Toujours visible · scroll dans la liste</div>
+            </div>
+            <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="scrollBox">
+            <div class="table">
+              <div class="thead loc">
+                <div>N° affaire</div>
+                <div>Début</div>
+                <div>Fin</div>
+                <div class="right">Masse</div>
+                <div class="right">Type</div>
+                <div class="right">Suppr.</div>
+              </div>
+              <div id="locRows"></div>
+            </div>
+          </div>
+
+          <div class="note" style="margin-top:10px">
+            Astuce : la suppression met à jour immédiatement le stock sur toutes les dates.
           </div>
         </div>
 
@@ -372,10 +375,10 @@
   }
 
   function overlaps(aStart, aEnd, bStart, bEnd){
-    // chevauchement inclusif
-    return !(aEnd < bStart || aStart > bEnd);
+    return !(aEnd < bStart || aStart > bEnd); // inclusif
   }
 
+  // Jours ouvrés (week-end exclu)
   function businessDaysInclusive(startIso, endIso){
     const s = parseDateISO(startIso);
     const e = parseDateISO(endIso);
@@ -392,11 +395,8 @@
     return Math.max(1, count);
   }
 
+  // Manutention auto selon masse
   function requiredHandlingItems(masseKg){
-    // Règles demandées :
-    // - par défaut ≤10t : timon 10t => "petit timon"
-    // - 10t..20t : timon 20t => "grand timon"
-    // - >20t : inclure châssis + grand timon
     if(masseKg == null) return { label: "—", items:{} };
 
     const t = masseKg / 1000;
@@ -406,6 +406,7 @@
     if(t <= 20){
       return { label: "10–20t : grand timon (20t)", items: { "grand timon": 1 } };
     }
+    // >20t : châssis dans la nomenclature + grand timon
     return { label: ">20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
   }
 
@@ -417,7 +418,6 @@
     if(!s || !e || e < s) return reserved;
 
     const locations = loadLocations();
-
     for(const r of locations){
       const rs = parseDateISO(r.start);
       const re = parseDateISO(r.end);
@@ -445,7 +445,7 @@
   function computeDecomposition(masseDemandeeKg, massesDisponibles, handlingItems){
     if(masseDemandeeKg == null) return { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] };
 
-    // 1) On bloque les items de manutention (si nécessaires) dans le stock restant
+    // 1) Réserve la manutention en priorité (déduit du stock restant)
     const mapAvail = new Map(massesDisponibles.map(m => [m.ref, { ...m }]));
     const handlingLines = [];
     let handlingOk = true;
@@ -454,11 +454,8 @@
       const m = mapAvail.get(ref);
       const dispo = m ? (m.dispoRestante ?? 0) : 0;
       if(dispo < qty) handlingOk = false;
-
-      // Déduit du dispoRestante pour ne pas qu’il soit utilisé par la décomposition
       if(m) m.dispoRestante = Math.max(0, dispo - qty);
 
-      // Ajoute une ligne de nomenclature (manutention)
       const poidsKg = m ? m.poidsKg : 0;
       handlingLines.push({ ref, qte: qty, poidsKg, sousTotalKg: qty * poidsKg, isHandling:true });
     }
@@ -466,7 +463,6 @@
     // 2) Décomposition des masses (hors manutention)
     let reste = Math.max(0, Math.round(masseDemandeeKg));
     const lignes = [];
-
     const massesSorted = [...mapAvail.values()].sort((a,b)=>b.poidsKg - a.poidsKg);
 
     for(const m of massesSorted){
@@ -556,6 +552,8 @@
     trAR: document.getElementById("trAR"),
 
     locRows: document.getElementById("locRows"),
+
+    clearAllBtn: document.getElementById("clearAllBtn"),
   };
 
   // Defaults
@@ -589,7 +587,7 @@
     }
     els.locRows.innerHTML = locs.map(l => `
       <div class="trow loc">
-        <div style="font-weight:850">${l.affaire || "—"}</div>
+        <div style="font-weight:950">${l.affaire || "—"}</div>
         <div>${l.start || "—"}</div>
         <div>${l.end || "—"}</div>
         <div class="right">${NF(l.masseKg)} kg</div>
@@ -600,13 +598,12 @@
       </div>
     `).join("");
 
-    // Bind delete
     els.locRows.querySelectorAll("button[data-del]").forEach(btn=>{
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-del");
         const next = loadLocations().filter(x => x.id !== id);
         saveLocations(next);
-        render(); // stock + tout
+        render();
       });
     });
   }
@@ -674,30 +671,28 @@
           <div>${m.ref}</div>
           <div class="right">${NF(m.dispo)}</div>
           <div class="right">${NF(m.reserved)}</div>
-          <div class="right" style="font-weight:850">${NF(m.dispoRestante)}</div>
+          <div class="right" style="font-weight:950">${NF(m.dispoRestante)}</div>
           <div class="right" style="font-weight:950;color:${ok ? "var(--good)" : "var(--warn)"}">${ok ? "OK" : "0"}</div>
         </div>
       `;
     }).join("");
 
-    // Décomposition (utilise stock restant + bloque la manutention)
+    // Décomposition (stock restant + manutention réservée)
     const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] }
                               : computeDecomposition(masse, massesDisponibles, manut.items);
 
-    // Affichage de la préparation = manutention + masses
     const combined = [...(plan.handlingLines||[]), ...(plan.lignes||[])];
     els.prepRows.innerHTML = combined.length === 0
       ? `<div class="trow"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
       : combined.map(l => `
           <div class="trow">
             <div>${l.ref}${l.isHandling ? ' <span class="badge" style="margin-left:8px">Manutention</span>' : ""}</div>
-            <div class="right" style="font-weight:850">${NF(l.qte)}</div>
+            <div class="right" style="font-weight:950">${NF(l.qte)}</div>
             <div class="right" style="color:rgba(15,23,42,.70)">${NF(l.poidsKg)} kg</div>
-            <div class="right" style="font-weight:850">${NF(l.sousTotalKg)} kg</div>
+            <div class="right" style="font-weight:950">${NF(l.sousTotalKg)} kg</div>
           </div>
         `).join("");
 
-    // Total préparé masses seules (hors manutention)
     els.prepTotal.textContent = (masse==null) ? "—" : `${NF(plan.totalKg)} kg`;
 
     els.prepMsg.innerHTML = "";
@@ -713,11 +708,10 @@
       els.prepMsg.innerHTML = msg;
     }
 
-    // Liste des locations enregistrées
     renderLocationsList();
   }
 
-  // Save (valider)
+  // Valider / enregistrer
   els.saveBtn.addEventListener("click", () => {
     const affaire = String(els.affaire.value || "").trim();
     const masse = getMasseKgNum();
@@ -728,6 +722,7 @@
     const typeCamion = els.typeCamion.value;
 
     const jours = businessDaysInclusive(d1, d2);
+
     if(!affaire){
       alert("Merci de renseigner un N° d’affaire avant de valider.");
       return;
@@ -741,7 +736,6 @@
       return;
     }
 
-    // Calcule le plan final (stock restant + manutention)
     const massesDisponibles = getAvailableMasses(d1, d2);
     const manut = requiredHandlingItems(masse);
     const plan = computeDecomposition(masse, massesDisponibles, manut.items);
@@ -753,7 +747,6 @@
       if(!confirm("Le matériel de manutention requis (timon/châssis) semble indisponible sur ces dates. Enregistrer quand même ?")) return;
     }
 
-    // items = manutention + masses
     const items = {
       ...linesToItemsMap(plan.handlingLines || []),
       ...linesToItemsMap(plan.lignes || []),
@@ -772,16 +765,22 @@
       masseKg: Math.round(masse),
       tarif,
       joursOuvres: jours,
-      items, // map ref->qty pour déduction stock
+      items,
       createdAt: new Date().toISOString(),
     });
 
     saveLocations(locs);
-
-    // reset affaire (option)
     els.affaire.value = "";
     render();
     alert("Location enregistrée ✅ Le stock est maintenant mis à jour sur la période.");
+  });
+
+  // Tout effacer
+  els.clearAllBtn.addEventListener("click", () => {
+    if(confirm("Supprimer TOUTES les locations enregistrées sur ce poste ?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
   });
 
   // Reset
@@ -806,6 +805,7 @@
     els.typeCamion.addEventListener(evt,render);
   });
 
+  // Init
   render();
 </script>
 </body>
