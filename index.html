@@ -81,6 +81,38 @@
       border:1px solid var(--line); background:#fff; border-radius:999px;
       padding:6px 10px; font-size:12px; color:var(--muted)
     }
+    /* --- Amélioration lisibilité : panneau réservations visible --- */
+.rightCol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+/* Sur desktop : résultat à gauche, réservations à droite */
+@media (min-width: 1100px) {
+  .rightCol {
+    grid-template-columns: 1fr 420px;
+    align-items: start;
+  }
+}
+
+.sticky {
+  position: sticky;
+  top: 16px;
+}
+
+.scrollBox {
+  max-height: 58vh;        /* la liste scrolle dans son bloc */
+  overflow: auto;
+}
+
+.scrollBox::-webkit-scrollbar { width: 10px; }
+.scrollBox::-webkit-scrollbar-thumb {
+  background: rgba(2,6,23,.18);
+  border-radius: 999px;
+  border: 3px solid rgba(255,255,255,.7);
+}
+
   </style>
 </head>
 <body>
