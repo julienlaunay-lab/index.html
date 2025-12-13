@@ -14,6 +14,7 @@
       --accent:#2563eb;
       --good:#16a34a;
       --warn:#f59e0b;
+      --danger:#dc2626;
       --soft:#f3f4f6;
     }
     *{box-sizing:border-box}
@@ -23,7 +24,7 @@
       color:var(--text);
       font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
-    .wrap{max-width:1200px;margin:0 auto;padding:22px}
+    .wrap{max-width:1250px;margin:0 auto;padding:22px}
     h1{margin:0 0 6px;font-size:28px;letter-spacing:-.02em}
     p.sub{margin:0 0 18px;color:var(--muted)}
     .grid{display:grid;grid-template-columns:1fr;gap:14px}
@@ -51,24 +52,29 @@
       border:1px solid var(--line);border-radius:16px;padding:12px
     }
     .kpi .t{font-size:12px;color:var(--muted)}
-    .kpi .v{font-size:18px;font-weight:750;margin-top:4px}
+    .kpi .v{font-size:18px;font-weight:850;margin-top:4px}
     .sep{height:1px;background:var(--line);margin:14px 0}
     .table{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
     .thead,.trow{display:grid;grid-template-columns: 6fr 2fr 2fr 2fr;gap:10px;align-items:center}
     .thead{background:#f8fafc;padding:10px 12px;font-size:12px;color:var(--muted)}
     .trow{padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
     .thead.stock,.trow.stock{grid-template-columns: 5fr 2fr 2fr 2fr 1fr}
+    .thead.loc,.trow.loc{grid-template-columns: 3fr 2fr 2fr 2fr 1fr 1fr}
     .right{text-align:right}
     .note{font-size:12px;color:var(--muted)}
     .warn{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.10);border-radius:16px;padding:10px 12px}
     .good{border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,.10);border-radius:16px;padding:10px 12px}
+    .danger{border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.08);border-radius:16px;padding:10px 12px}
     .btns{display:flex;gap:10px;flex-wrap:wrap}
     button{
       padding:10px 12px;border-radius:12px;border:1px solid var(--line);
       background:#fff; color:var(--text); cursor:pointer
     }
-    button:hover{border-color:rgba(2,6,23,.25)}
-    .big{font-size:22px;font-weight:850}
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    button.primary:hover{filter:brightness(.95)}
+    button.dangerBtn{background:#fff;border-color:rgba(220,38,38,.35);color:var(--danger)}
+    button.dangerBtn:hover{border-color:rgba(220,38,38,.60)}
+    .big{font-size:22px;font-weight:950}
     .muted{color:var(--muted)}
     .badge{
       display:inline-flex;align-items:center;gap:6px;
@@ -80,7 +86,7 @@
 <body>
   <div class="wrap">
     <h1>Configurateur – location masses d’essai</h1>
-    <p class="sub">Saisis la masse (kg), les dates, le département et le type de camion. Le tarif + transport + préparation + stock dispo se calculent automatiquement.</p>
+    <p class="sub">Saisis la masse (kg), les dates, le département et le type de camion. Le tarif + transport + préparation + stock dispo se calculent automatiquement. Puis “Valider” pour réserver.</p>
 
     <div class="grid">
       <!-- Paramètres -->
@@ -122,6 +128,15 @@
           </div>
         </div>
 
+        <div class="sep"></div>
+
+        <div class="row">
+          <div>
+            <label for="affaire">N° d’affaire (obligatoire pour valider)</label>
+            <input id="affaire" placeholder="Ex : AFF-2025-014" />
+          </div>
+        </div>
+
         <div class="pill">
           <div class="kpi">
             <div class="t">Durée (jours ouvrés)</div>
@@ -134,9 +149,9 @@
             <div class="note">forfait mini</div>
           </div>
           <div class="kpi">
-            <div class="t">Transport</div>
-            <div class="v"><span class="badge">Aller simple (grille) ×2 A/R</span></div>
-            <div class="note">Tarif GO compris</div>
+            <div class="t">Manutention (auto)</div>
+            <div class="v"><span class="badge" id="kpiManut">—</span></div>
+            <div class="note">selon ton seuil 10t / 20t</div>
           </div>
         </div>
 
@@ -144,10 +159,11 @@
 
         <div class="btns">
           <button id="resetBtn" type="button">Réinitialiser</button>
+          <button id="saveBtn" type="button" class="primary">Valider / enregistrer la location</button>
         </div>
 
         <div class="note" style="margin-top:10px">
-          Stock : calculé sur la période sélectionnée en déduisant les réservations déjà enregistrées (voir la liste dans le code).
+          Les locations validées sont enregistrées dans ce navigateur (LocalStorage). Le stock “dispo” tient compte des chevauchements de dates.
         </div>
       </div>
 
@@ -166,7 +182,7 @@
         <div id="alerts"></div>
 
         <div style="margin-top:12px">
-          <div style="font-weight:750;margin-bottom:8px">Stock dispo sur la période</div>
+          <div style="font-weight:850;margin-bottom:8px">Stock dispo sur la période (réservations déduites)</div>
           <div class="table">
             <div class="thead stock">
               <div>Type</div>
@@ -178,14 +194,14 @@
             <div id="stockRows"></div>
           </div>
           <div class="note" style="margin-top:8px">
-            “Réservé” = total des réservations qui chevauchent tes dates (même 1 jour).
+            “Réservé” = total des locations enregistrées qui chevauchent tes dates.
           </div>
         </div>
 
         <div class="sep"></div>
 
         <div style="margin-top:12px">
-          <div style="font-weight:750;margin-bottom:8px">Préparation (décomposition automatique)</div>
+          <div style="font-weight:850;margin-bottom:8px">Préparation (décomposition + manutention auto)</div>
           <div class="table" id="prepTable">
             <div class="thead">
               <div>Type de masse</div>
@@ -195,8 +211,8 @@
             </div>
             <div id="prepRows"></div>
             <div class="trow" style="background:#f8fafc">
-              <div class="muted" style="grid-column:1 / span 3">Total préparé</div>
-              <div class="right" style="font-weight:850" id="prepTotal">—</div>
+              <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
+              <div class="right" style="font-weight:950" id="prepTotal">—</div>
             </div>
           </div>
           <div id="prepMsg" style="margin-top:10px"></div>
@@ -226,12 +242,33 @@
           </div>
         </div>
 
+        <div class="sep"></div>
+
+        <div style="margin-top:12px">
+          <div style="font-weight:850;margin-bottom:8px">Locations enregistrées (ce poste)</div>
+          <div class="table">
+            <div class="thead loc">
+              <div>N° affaire</div>
+              <div>Début</div>
+              <div>Fin</div>
+              <div class="right">Masse</div>
+              <div class="right">Type</div>
+              <div class="right">Suppr.</div>
+            </div>
+            <div id="locRows"></div>
+          </div>
+          <div class="note" style="margin-top:8px">
+            Pour une base partagée multi-collaborateurs, on branchera ensuite une source centralisée (Google Sheet / Airtable).
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
 <script>
   // ======= PARAMÈTRES =======
+  const STORAGE_KEY = "masses_locations_v1";
   const MIN_LOCATION = 250;
 
   // Stock (issu de ton XLS) : poids unitaires (kg) + quantité totale
@@ -243,8 +280,8 @@
     { ref: "bleu", poidsKg: 200, dispo: 3 },
     { ref: "noir", poidsKg: 25, dispo: 26 },
     { ref: "châssis (chaîne incluse)", poidsKg: 2500, dispo: 1 },
-    { ref: "petit timon", poidsKg: 56, dispo: 1 },
-    { ref: "grand timon", poidsKg: 200, dispo: 1 },
+    { ref: "petit timon", poidsKg: 56, dispo: 1 },   // timon 10t
+    { ref: "grand timon", poidsKg: 200, dispo: 1 },  // timon 20t
   ];
 
   // Transport (aller simple). Aller/retour = x2. Colonnes = type de camion.
@@ -273,19 +310,17 @@
     "85": { "6M": 385, "9M": 401, "Complet": 425 },
   };
 
-  // >>> IMPORTANT <<<
-  // Réservations déjà prises (à maintenir / compléter).
-  // Format : dates ISO yyyy-mm-dd + quantités par type (ref).
-  // Toute réservation qui CHEVAUCHE ta période est comptée comme "réservée".
-  const RESERVATIONS = [
-    // Exemple :
-    // {
-    //   id: "LOC-2025-001",
-    //   start: "2025-03-03",
-    //   end:   "2025-03-07",
-    //   items: { "orange": 2, "noir": 10, "bleu": 1 }
-    // },
-  ];
+  // ======= STORAGE =======
+  function loadLocations(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+  function saveLocations(arr){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
 
   // ======= HELPERS =======
   const EUR = (n) => (n==null || Number.isNaN(n)) ? "—" :
@@ -298,7 +333,6 @@
     new Intl.NumberFormat("fr-FR",{maximumFractionDigits:2}).format(n);
 
   function parseDateISO(s){
-    // input type=date => yyyy-mm-dd
     if(!s) return null;
     const [y,m,d] = s.split("-").map(x => parseInt(x,10));
     if(!y||!m||!d) return null;
@@ -316,7 +350,6 @@
     if(!s || !e) return null;
     if(e < s) return null;
 
-    // compte Lun..Ven inclusif
     let count = 0;
     const d = new Date(s.getTime());
     while(d <= e){
@@ -324,7 +357,24 @@
       if(dow !== 0 && dow !== 6) count++;
       d.setUTCDate(d.getUTCDate() + 1);
     }
-    return Math.max(1, count); // min 1 jour
+    return Math.max(1, count);
+  }
+
+  function requiredHandlingItems(masseKg){
+    // Règles demandées :
+    // - par défaut ≤10t : timon 10t => "petit timon"
+    // - 10t..20t : timon 20t => "grand timon"
+    // - >20t : inclure châssis + grand timon
+    if(masseKg == null) return { label: "—", items:{} };
+
+    const t = masseKg / 1000;
+    if(t <= 10){
+      return { label: "≤10t : petit timon (10t)", items: { "petit timon": 1 } };
+    }
+    if(t <= 20){
+      return { label: "10–20t : grand timon (20t)", items: { "grand timon": 1 } };
+    }
+    return { label: ">20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
   }
 
   function getReservedMap(startIso, endIso){
@@ -334,7 +384,9 @@
 
     if(!s || !e || e < s) return reserved;
 
-    for(const r of RESERVATIONS){
+    const locations = loadLocations();
+
+    for(const r of locations){
       const rs = parseDateISO(r.start);
       const re = parseDateISO(r.end);
       if(!rs || !re) continue;
@@ -358,54 +410,87 @@
       .sort((a,b)=> b.poidsKg - a.poidsKg);
   }
 
-  function computeDecomposition(masseDemandeeKg, massesDisponibles){
-    if(masseDemandeeKg == null) return { lignes:[], totalKg:0, ok:false };
+  function computeDecomposition(masseDemandeeKg, massesDisponibles, handlingItems){
+    if(masseDemandeeKg == null) return { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] };
 
+    // 1) On bloque les items de manutention (si nécessaires) dans le stock restant
+    const mapAvail = new Map(massesDisponibles.map(m => [m.ref, { ...m }]));
+    const handlingLines = [];
+    let handlingOk = true;
+
+    for(const [ref, qty] of Object.entries(handlingItems || {})){
+      const m = mapAvail.get(ref);
+      const dispo = m ? (m.dispoRestante ?? 0) : 0;
+      if(dispo < qty) handlingOk = false;
+
+      // Déduit du dispoRestante pour ne pas qu’il soit utilisé par la décomposition
+      if(m) m.dispoRestante = Math.max(0, dispo - qty);
+
+      // Ajoute une ligne de nomenclature (manutention)
+      const poidsKg = m ? m.poidsKg : 0;
+      handlingLines.push({ ref, qte: qty, poidsKg, sousTotalKg: qty * poidsKg, isHandling:true });
+    }
+
+    // 2) Décomposition des masses (hors manutention)
     let reste = Math.max(0, Math.round(masseDemandeeKg));
     const lignes = [];
 
-    // Greedy du plus lourd au plus léger (avec dispoRestante)
-    for(const m of massesDisponibles){
+    const massesSorted = [...mapAvail.values()].sort((a,b)=>b.poidsKg - a.poidsKg);
+
+    for(const m of massesSorted){
       if(reste <= 0) break;
-      const dispo = m.dispoRestante ?? m.dispo ?? 0;
+      const dispo = m.dispoRestante ?? 0;
       if(dispo <= 0) continue;
 
       const qte = Math.min(dispo, Math.floor(reste / m.poidsKg));
       if(qte > 0){
         const sousTotal = qte * m.poidsKg;
-        lignes.push({ ref:m.ref, poidsKg:m.poidsKg, qte, sousTotalKg:sousTotal });
+        lignes.push({ ref:m.ref, poidsKg:m.poidsKg, qte, sousTotalKg:sousTotal, isHandling:false });
         reste -= sousTotal;
+        m.dispoRestante -= qte;
       }
     }
 
-    // Complète avec les plus petites (si reliquat)
     if(reste > 0){
-      const asc = [...massesDisponibles].sort((a,b)=>a.poidsKg - b.poidsKg);
+      const asc = [...massesSorted].sort((a,b)=>a.poidsKg - b.poidsKg);
       for(const m of asc){
         if(reste <= 0) break;
+        const dispo = m.dispoRestante ?? 0;
+        if(dispo <= 0) continue;
 
-        const dispoTotal = m.dispoRestante ?? m.dispo ?? 0;
-        const deja = lignes.find(x=>x.ref === m.ref);
-        const dejaQte = deja ? deja.qte : 0;
-        const dispoRestante = Math.max(0, dispoTotal - dejaQte);
-        if(dispoRestante <= 0) continue;
-
-        const qteAjout = Math.min(dispoRestante, Math.ceil(reste / m.poidsKg));
+        const qteAjout = Math.min(dispo, Math.ceil(reste / m.poidsKg));
         if(qteAjout > 0){
+          const deja = lignes.find(x=>x.ref===m.ref);
           if(deja){
             deja.qte += qteAjout;
             deja.sousTotalKg += qteAjout * m.poidsKg;
           } else {
-            lignes.push({ ref:m.ref, poidsKg:m.poidsKg, qte:qteAjout, sousTotalKg:qteAjout*m.poidsKg });
+            lignes.push({ ref:m.ref, poidsKg:m.poidsKg, qte:qteAjout, sousTotalKg:qteAjout*m.poidsKg, isHandling:false });
           }
           reste -= qteAjout * m.poidsKg;
+          m.dispoRestante -= qteAjout;
         }
       }
     }
 
     const lignesTriees = lignes.filter(l=>l.qte>0).sort((a,b)=>b.poidsKg - a.poidsKg);
     const totalKg = lignesTriees.reduce((s,l)=>s+l.sousTotalKg,0);
-    return { lignes:lignesTriees, totalKg, ok: totalKg >= Math.round(masseDemandeeKg) };
+
+    return {
+      lignes: lignesTriees,
+      totalKg,
+      ok: totalKg >= Math.round(masseDemandeeKg),
+      handlingOk,
+      handlingLines: handlingLines.filter(l=>l.qte>0),
+    };
+  }
+
+  function linesToItemsMap(lines){
+    const map = {};
+    for(const l of lines){
+      map[l.ref] = (map[l.ref] || 0) + (Number(l.qte) || 0);
+    }
+    return map;
   }
 
   // ======= UI =======
@@ -416,23 +501,29 @@
     departement: document.getElementById("departement"),
     typeCamion: document.getElementById("typeCamion"),
     tarifKgJour: document.getElementById("tarifKgJour"),
+    affaire: document.getElementById("affaire"),
+
     resetBtn: document.getElementById("resetBtn"),
+    saveBtn: document.getElementById("saveBtn"),
 
     kpiDuree: document.getElementById("kpiDuree"),
     kpiTotal: document.getElementById("kpiTotal"),
     resume: document.getElementById("resume"),
+    kpiManut: document.getElementById("kpiManut"),
 
     alerts: document.getElementById("alerts"),
+    stockRows: document.getElementById("stockRows"),
+
     prepRows: document.getElementById("prepRows"),
     prepTotal: document.getElementById("prepTotal"),
     prepMsg: document.getElementById("prepMsg"),
-
-    stockRows: document.getElementById("stockRows"),
 
     locBrut: document.getElementById("locBrut"),
     locMin: document.getElementById("locMin"),
     trAller: document.getElementById("trAller"),
     trAR: document.getElementById("trAR"),
+
+    locRows: document.getElementById("locRows"),
   };
 
   // Defaults
@@ -458,6 +549,36 @@
     return Number.isFinite(n) && n >= 0 ? n : null;
   }
 
+  function renderLocationsList(){
+    const locs = loadLocations().slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+    if(locs.length === 0){
+      els.locRows.innerHTML = `<div class="trow loc"><div class="muted" style="grid-column:1 / span 6">—</div></div>`;
+      return;
+    }
+    els.locRows.innerHTML = locs.map(l => `
+      <div class="trow loc">
+        <div style="font-weight:850">${l.affaire || "—"}</div>
+        <div>${l.start || "—"}</div>
+        <div>${l.end || "—"}</div>
+        <div class="right">${NF(l.masseKg)} kg</div>
+        <div class="right">${l.typeCamion || "—"}</div>
+        <div class="right">
+          <button class="dangerBtn" data-del="${l.id}" type="button">✕</button>
+        </div>
+      </div>
+    `).join("");
+
+    // Bind delete
+    els.locRows.querySelectorAll("button[data-del]").forEach(btn=>{
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-del");
+        const next = loadLocations().filter(x => x.id !== id);
+        saveLocations(next);
+        render(); // stock + tout
+      });
+    });
+  }
+
   function render(){
     const masse = getMasseKgNum();
     const tarif = getTarifNum();
@@ -467,6 +588,9 @@
     const typeCamion = els.typeCamion.value;
 
     const jours = businessDaysInclusive(d1, d2);
+
+    const manut = requiredHandlingItems(masse);
+    els.kpiManut.textContent = manut.label;
 
     // Alerts
     const alerts = [];
@@ -509,7 +633,7 @@
       els.resume.textContent = `Pour ${NF(masse)} kg sur ${jours} jour(s) ouvré(s) en ${dep} (${typeCamion}) · Tarif ${NF2(tarif)} €/kg/j`;
     }
 
-    // Stock sur période (déduit réservations)
+    // Stock sur période (déduit locations enregistrées)
     const massesDisponibles = getAvailableMasses(d1, d2);
     els.stockRows.innerHTML = massesDisponibles.map(m => {
       const ok = m.dispoRestante > 0;
@@ -518,46 +642,117 @@
           <div>${m.ref}</div>
           <div class="right">${NF(m.dispo)}</div>
           <div class="right">${NF(m.reserved)}</div>
-          <div class="right" style="font-weight:750">${NF(m.dispoRestante)}</div>
-          <div class="right" style="font-weight:850;color:${ok ? "var(--good)" : "var(--warn)"}">${ok ? "OK" : "0"}</div>
+          <div class="right" style="font-weight:850">${NF(m.dispoRestante)}</div>
+          <div class="right" style="font-weight:950;color:${ok ? "var(--good)" : "var(--warn)"}">${ok ? "OK" : "0"}</div>
         </div>
       `;
     }).join("");
 
-    // Décomposition (utilise le stock restant)
-    const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false } : computeDecomposition(masse, massesDisponibles);
+    // Décomposition (utilise stock restant + bloque la manutention)
+    const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] }
+                              : computeDecomposition(masse, massesDisponibles, manut.items);
 
-    els.prepRows.innerHTML = plan.lignes.length === 0
+    // Affichage de la préparation = manutention + masses
+    const combined = [...(plan.handlingLines||[]), ...(plan.lignes||[])];
+    els.prepRows.innerHTML = combined.length === 0
       ? `<div class="trow"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
-      : plan.lignes.map(l => `
+      : combined.map(l => `
           <div class="trow">
-            <div>${l.ref}</div>
-            <div class="right" style="font-weight:750">${NF(l.qte)}</div>
+            <div>${l.ref}${l.isHandling ? ' <span class="badge" style="margin-left:8px">Manutention</span>' : ""}</div>
+            <div class="right" style="font-weight:850">${NF(l.qte)}</div>
             <div class="right" style="color:rgba(15,23,42,.70)">${NF(l.poidsKg)} kg</div>
-            <div class="right" style="font-weight:750">${NF(l.sousTotalKg)} kg</div>
+            <div class="right" style="font-weight:850">${NF(l.sousTotalKg)} kg</div>
           </div>
         `).join("");
 
+    // Total préparé masses seules (hors manutention)
     els.prepTotal.textContent = (masse==null) ? "—" : `${NF(plan.totalKg)} kg`;
 
     els.prepMsg.innerHTML = "";
     if(masse != null){
       const delta = plan.totalKg - Math.round(masse);
-      els.prepMsg.innerHTML = plan.ok
-        ? `<div class="good">Objectif atteint. Surplus : ${NF(delta)} kg (stock restant pris en compte).</div>`
-        : `<div class="warn"><b>Attention :</b> stock insuffisant sur ces dates pour atteindre ${NF(masse)} kg (réservations déjà déduites).</div>`;
+      let msg = plan.ok
+        ? `<div class="good">Objectif masses atteint. Surplus : ${NF(delta)} kg (stock restant pris en compte).</div>`
+        : `<div class="warn"><b>Attention :</b> stock insuffisant sur ces dates pour atteindre ${NF(masse)} kg (réservations déduites).</div>`;
+
+      if(!plan.handlingOk){
+        msg += `<div class="danger" style="margin-top:8px"><b>Manutention indisponible :</b> timon/châssis requis non disponible sur ces dates.</div>`;
+      }
+      els.prepMsg.innerHTML = msg;
     }
+
+    // Liste des locations enregistrées
+    renderLocationsList();
   }
 
-  ["input","change"].forEach(evt=>{
-    els.masseKg.addEventListener(evt,render);
-    els.tarifKgJour.addEventListener(evt,render);
-    els.dateDebut.addEventListener(evt,render);
-    els.dateFin.addEventListener(evt,render);
-    els.departement.addEventListener(evt,render);
-    els.typeCamion.addEventListener(evt,render);
+  // Save (valider)
+  els.saveBtn.addEventListener("click", () => {
+    const affaire = String(els.affaire.value || "").trim();
+    const masse = getMasseKgNum();
+    const tarif = getTarifNum();
+    const d1 = els.dateDebut.value;
+    const d2 = els.dateFin.value;
+    const dep = els.departement.value;
+    const typeCamion = els.typeCamion.value;
+
+    const jours = businessDaysInclusive(d1, d2);
+    if(!affaire){
+      alert("Merci de renseigner un N° d’affaire avant de valider.");
+      return;
+    }
+    if(masse == null || tarif == null || !d1 || !d2 || !dep){
+      alert("Merci de renseigner : masse, dates, département (et un tarif valide).");
+      return;
+    }
+    if(jours == null){
+      alert("Dates invalides (fin avant début).");
+      return;
+    }
+
+    // Calcule le plan final (stock restant + manutention)
+    const massesDisponibles = getAvailableMasses(d1, d2);
+    const manut = requiredHandlingItems(masse);
+    const plan = computeDecomposition(masse, massesDisponibles, manut.items);
+
+    if(!plan.ok){
+      if(!confirm("Le stock masses semble insuffisant pour atteindre la masse demandée sur ces dates. Enregistrer quand même ?")) return;
+    }
+    if(!plan.handlingOk){
+      if(!confirm("Le matériel de manutention requis (timon/châssis) semble indisponible sur ces dates. Enregistrer quand même ?")) return;
+    }
+
+    // items = manutention + masses
+    const items = {
+      ...linesToItemsMap(plan.handlingLines || []),
+      ...linesToItemsMap(plan.lignes || []),
+    };
+
+    const locs = loadLocations();
+    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+    locs.push({
+      id,
+      affaire,
+      start: d1,
+      end: d2,
+      departement: dep,
+      typeCamion,
+      masseKg: Math.round(masse),
+      tarif,
+      joursOuvres: jours,
+      items, // map ref->qty pour déduction stock
+      createdAt: new Date().toISOString(),
+    });
+
+    saveLocations(locs);
+
+    // reset affaire (option)
+    els.affaire.value = "";
+    render();
+    alert("Location enregistrée ✅ Le stock est maintenant mis à jour sur la période.");
   });
 
+  // Reset
   els.resetBtn.addEventListener("click", () => {
     els.masseKg.value = "";
     els.dateDebut.value = "";
@@ -565,7 +760,18 @@
     els.departement.value = "";
     els.typeCamion.value = "Complet";
     els.tarifKgJour.value = "0.05";
+    els.affaire.value = "";
     render();
+  });
+
+  // Re-render on input
+  ["input","change"].forEach(evt=>{
+    els.masseKg.addEventListener(evt,render);
+    els.tarifKgJour.addEventListener(evt,render);
+    els.dateDebut.addEventListener(evt,render);
+    els.dateFin.addEventListener(evt,render);
+    els.departement.addEventListener(evt,render);
+    els.typeCamion.addEventListener(evt,render);
   });
 
   render();
