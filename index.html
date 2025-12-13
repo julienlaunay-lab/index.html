@@ -24,20 +24,30 @@
       color:var(--text);
       font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
-    .wrap{max-width:1250px;margin:0 auto;padding:22px}
-    h1{margin:0 0 6px;font-size:28px;letter-spacing:-.02em}
-    p.sub{margin:0 0 18px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr;gap:14px}
-    @media(min-width:980px){.grid{grid-template-columns:1fr 1fr;gap:16px}}
+    .wrap{max-width:1400px;margin:0 auto;padding:18px}
+    h1{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}
+    p.sub{margin:0 0 14px;color:var(--muted);max-width:1100px}
+
+    /* Layout global : 3 colonnes desktop (params / résultat / réservations) */
+    .layout{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:1200px){
+      .layout{
+        grid-template-columns: 360px minmax(520px, 1fr) 420px;
+        align-items:start;
+      }
+    }
+
     .card{
       background:var(--card);
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
+      border-radius:16px;
+      padding:14px;
       box-shadow:0 10px 30px rgba(2,6,23,.06);
     }
+
     .row{display:grid;grid-template-columns:1fr;gap:10px}
     @media(min-width:520px){.row.two{grid-template-columns:1fr 1fr}}
+
     label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
     input,select{
       width:100%; padding:10px 12px; border-radius:12px;
@@ -46,25 +56,35 @@
     }
     input:focus,select:focus{border-color:rgba(37,99,235,.5); box-shadow:0 0 0 4px rgba(37,99,235,.12)}
     input::placeholder{color:rgba(15,23,42,.35)}
+
     .pill{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .kpi{
-      flex:1;min-width:190px;background:var(--soft);
-      border:1px solid var(--line);border-radius:16px;padding:12px
+      flex:1;min-width:170px;background:var(--soft);
+      border:1px solid var(--line);border-radius:14px;padding:12px
     }
     .kpi .t{font-size:12px;color:var(--muted)}
     .kpi .v{font-size:18px;font-weight:850;margin-top:4px}
-    .sep{height:1px;background:var(--line);margin:14px 0}
-    .table{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
-    .thead,.trow{display:grid;grid-template-columns: 6fr 2fr 2fr 2fr;gap:10px;align-items:center}
-    .thead{background:#f8fafc;padding:10px 12px;font-size:12px;color:var(--muted)}
-    .trow{padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
-    .thead.stock,.trow.stock{grid-template-columns: 5fr 2fr 2fr 2fr 1fr}
-    .thead.loc,.trow.loc{grid-template-columns: 3fr 2fr 2fr 2fr 1fr 1fr}
+
+    .sep{height:1px;background:var(--line);margin:12px 0}
+
+    .table{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    .thead,.trow{display:grid;gap:10px;align-items:center}
+    .thead{background:#f8fafc;padding:9px 10px;font-size:12px;color:var(--muted)}
+    .trow{padding:9px 10px;border-top:1px solid var(--line);font-size:14px}
     .right{text-align:right}
-    .note{font-size:12px;color:var(--muted)}
-    .warn{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.10);border-radius:16px;padding:10px 12px}
-    .good{border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,.10);border-radius:16px;padding:10px 12px}
-    .danger{border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.08);border-radius:16px;padding:10px 12px}
+
+    .thead.stock,.trow.stock{grid-template-columns: 5fr 2fr 2fr 2fr 1fr}
+    .thead.prep,.trow.prep{grid-template-columns: 6fr 2fr 2fr 2fr}
+    .thead.loc,.trow.loc{
+      grid-template-columns: 2.2fr 1.3fr 1.3fr 1.2fr 1fr 46px;
+      gap:8px;
+    }
+
+    .note{font-size:12px;color:var(--muted);line-height:1.35}
+    .warn{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.10);border-radius:14px;padding:10px 12px}
+    .good{border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,.10);border-radius:14px;padding:10px 12px}
+    .danger{border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.08);border-radius:14px;padding:10px 12px}
+
     .btns{display:flex;gap:10px;flex-wrap:wrap}
     button{
       padding:10px 12px;border-radius:12px;border:1px solid var(--line);
@@ -74,6 +94,7 @@
     button.primary:hover{filter:brightness(.95)}
     button.dangerBtn{background:#fff;border-color:rgba(220,38,38,.35);color:var(--danger)}
     button.dangerBtn:hover{border-color:rgba(220,38,38,.60)}
+
     .big{font-size:22px;font-weight:950}
     .muted{color:var(--muted)}
     .badge{
@@ -82,35 +103,60 @@
       padding:6px 10px; font-size:12px; color:var(--muted)
     }
 
-    /* --- Lisibilité : panneau réservations toujours visible --- */
-    .rightCol{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:16px;
+    /* --- Sticky réservations à droite --- */
+    .sticky{position:sticky; top:14px}
+
+    /* --- IMPORTANT : Résultats visibles sans scroller la page --- */
+    @media(min-width:1200px){
+      .resultPanel{
+        position: sticky;
+        top: 14px;
+        max-height: calc(100vh - 28px); /* hauteur écran */
+        overflow: auto;                 /* scroll interne */
+        padding-right: 6px;
+      }
+      .resultPanel::-webkit-scrollbar{ width:10px; }
+      .resultPanel::-webkit-scrollbar-thumb{
+        background:rgba(2,6,23,.18);
+        border-radius:999px;
+        border:3px solid rgba(255,255,255,.7);
+      }
     }
-    @media(min-width:1100px){
-      .rightCol{ grid-template-columns: 1fr 420px; align-items:start; }
+
+    /* --- Scroll interne réservations --- */
+    .scrollBox{
+      max-height: calc(100vh - 170px);
+      overflow:auto;
     }
-    .sticky{ position:sticky; top:16px; }
-    .scrollBox{ max-height:58vh; overflow:auto; }
     .scrollBox::-webkit-scrollbar{ width:10px; }
     .scrollBox::-webkit-scrollbar-thumb{
       background:rgba(2,6,23,.18);
       border-radius:999px;
       border:3px solid rgba(255,255,255,.7);
     }
+
+    /* Dates en une ligne, style compact */
+    .dateCell{white-space:nowrap; font-variant-numeric: tabular-nums}
+    .affaireCell{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .massCell{white-space:nowrap}
+    .typeCell{white-space:nowrap}
+
+    /* Petites améliorations visuelles */
+    .sectionTitle{font-weight:900;margin-bottom:8px}
+    .sectionTitle small{font-weight:600;color:var(--muted)}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>Configurateur – location masses d’essai</h1>
     <p class="sub">
-      Saisis la masse (kg), les dates, le département et le type de camion.
-      Calcul automatique : durée en jours ouvrés, location (tarif modifiable), transport, préparation + manutention, et stock dispo selon les réservations enregistrées.
+      Calcul automatique : <b>jours ouvrés</b> (week-end exclu), location (tarif modifiable), transport, préparation + manutention, stock dispo selon les réservations enregistrées.
     </p>
 
-    <div class="grid">
-      <!-- Paramètres -->
+    <div class="layout">
+
+      <!-- PARAMÈTRES -->
       <div class="card">
         <div class="row two">
           <div>
@@ -129,11 +175,11 @@
 
         <div class="row two" style="margin-top:10px">
           <div>
-            <label for="dateDebut">Date début (calendrier)</label>
+            <label for="dateDebut">Date début</label>
             <input id="dateDebut" type="date" />
           </div>
           <div>
-            <label for="dateFin">Date fin (calendrier)</label>
+            <label for="dateFin">Date fin</label>
             <input id="dateFin" type="date" />
           </div>
         </div>
@@ -180,124 +226,127 @@
 
         <div class="btns">
           <button id="resetBtn" type="button">Réinitialiser</button>
-          <button id="saveBtn" type="button" class="primary">Valider / enregistrer la location</button>
+          <button id="saveBtn" type="button" class="primary">Valider / enregistrer</button>
         </div>
 
         <div class="note" style="margin-top:10px">
-          Les locations validées sont enregistrées sur ce poste (LocalStorage). Le stock “dispo” est recalculé automatiquement en fonction des chevauchements de dates.
+          Les locations sont enregistrées sur ce poste (LocalStorage). Le stock “dispo” se met à jour automatiquement selon les chevauchements.
         </div>
       </div>
 
-      <!-- Colonne droite : Résultats + Réservations toujours visibles -->
-      <div class="rightCol">
-
-        <!-- RESULTATS -->
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
-            <div>
-              <div class="muted" style="font-size:12px">Total offre (HT)</div>
-              <div class="big" id="kpiTotal">—</div>
-            </div>
-            <div class="muted" id="resume" style="font-size:12px;max-width:560px;text-align:right"></div>
+      <!-- RESULTATS (sticky + scroll interne) -->
+      <div class="card resultPanel">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div>
+            <div class="muted" style="font-size:12px">Total offre (HT)</div>
+            <div class="big" id="kpiTotal">—</div>
           </div>
+          <div class="muted" id="resume" style="font-size:12px;max-width:560px;text-align:right"></div>
+        </div>
 
-          <div class="sep"></div>
-          <div id="alerts"></div>
+        <div class="sep"></div>
+        <div id="alerts"></div>
 
-          <div style="margin-top:12px">
-            <div style="font-weight:850;margin-bottom:8px">Stock dispo sur la période (réservations déduites)</div>
-            <div class="table">
-              <div class="thead stock">
-                <div>Type</div>
-                <div class="right">Stock</div>
-                <div class="right">Réservé</div>
-                <div class="right">Dispo</div>
-                <div class="right">OK</div>
-              </div>
-              <div id="stockRows"></div>
+        <div style="margin-top:12px">
+          <div class="sectionTitle">Stock dispo sur la période <small>(réservations déduites)</small></div>
+          <div class="table">
+            <div class="thead stock">
+              <div>Type</div>
+              <div class="right">Stock</div>
+              <div class="right">Réservé</div>
+              <div class="right">Dispo</div>
+              <div class="right">OK</div>
             </div>
-            <div class="note" style="margin-top:8px">
-              “Réservé” = total des locations enregistrées qui chevauchent tes dates.
-            </div>
+            <div id="stockRows"></div>
           </div>
-
-          <div class="sep"></div>
-
-          <div style="margin-top:12px">
-            <div style="font-weight:850;margin-bottom:8px">Préparation (décomposition + manutention auto)</div>
-            <div class="table" id="prepTable">
-              <div class="thead">
-                <div>Type de masse</div>
-                <div class="right">Qté</div>
-                <div class="right">Unitaire</div>
-                <div class="right">Total</div>
-              </div>
-              <div id="prepRows"></div>
-              <div class="trow" style="background:#f8fafc">
-                <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
-                <div class="right" style="font-weight:950" id="prepTotal">—</div>
-              </div>
-            </div>
-            <div id="prepMsg" style="margin-top:10px"></div>
-          </div>
-
-          <div class="sep"></div>
-
-          <div class="row">
-            <div class="kpi">
-              <div class="t">Location (brut)</div>
-              <div class="v" id="locBrut">—</div>
-            </div>
-            <div class="kpi">
-              <div class="t">Location (min 250€ appliqué)</div>
-              <div class="v" id="locMin">—</div>
-            </div>
-          </div>
-
-          <div class="row two" style="margin-top:10px">
-            <div class="kpi">
-              <div class="t">Transport (aller simple)</div>
-              <div class="v" id="trAller">—</div>
-            </div>
-            <div class="kpi">
-              <div class="t">Transport (aller/retour)</div>
-              <div class="v" id="trAR">—</div>
-            </div>
+          <div class="note" style="margin-top:8px">
+            “Réservé” = total des locations enregistrées qui chevauchent tes dates.
           </div>
         </div>
 
-        <!-- RESERVATIONS (Sticky + scroll interne) -->
-        <div class="card sticky">
-          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
-            <div>
-              <div style="font-weight:850">Locations enregistrées</div>
-              <div class="note">Toujours visible · scroll dans la liste</div>
+        <div class="sep"></div>
+
+        <div style="margin-top:12px">
+          <div class="sectionTitle">Préparation <small>(décomposition + manutention auto)</small></div>
+          <div class="table" id="prepTable">
+            <div class="thead prep">
+              <div>Type de masse</div>
+              <div class="right">Qté</div>
+              <div class="right">Unitaire</div>
+              <div class="right">Total</div>
             </div>
-            <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
-          </div>
-
-          <div class="sep"></div>
-
-          <div class="scrollBox">
-            <div class="table">
-              <div class="thead loc">
-                <div>N° affaire</div>
-                <div>Début</div>
-                <div>Fin</div>
-                <div class="right">Masse</div>
-                <div class="right">Type</div>
-                <div class="right">Suppr.</div>
-              </div>
-              <div id="locRows"></div>
+            <div id="prepRows"></div>
+            <div class="trow prep" style="background:#f8fafc">
+              <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
+              <div class="right" style="font-weight:950" id="prepTotal">—</div>
             </div>
           </div>
+          <div id="prepMsg" style="margin-top:10px"></div>
+        </div>
 
-          <div class="note" style="margin-top:10px">
-            Astuce : la suppression met à jour immédiatement le stock sur toutes les dates.
+        <div class="sep"></div>
+
+        <!-- ICI : la partie que tu ne voyais pas => maintenant accessible via scroll interne du panneau -->
+        <div class="row">
+          <div class="kpi">
+            <div class="t">Location (brut)</div>
+            <div class="v" id="locBrut">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Location (min 250€ appliqué)</div>
+            <div class="v" id="locMin">—</div>
           </div>
         </div>
 
+        <div class="row two" style="margin-top:10px">
+          <div class="kpi">
+            <div class="t">Transport (aller simple)</div>
+            <div class="v" id="trAller">—</div>
+          </div>
+          <div class="kpi">
+            <div class="t">Transport (aller/retour)</div>
+            <div class="v" id="trAR">—</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="note">
+          Astuce : sur PC, ce panneau “Résultats” reste visible et scrolle dans lui-même (pas besoin de scroller la page).
+        </div>
       </div>
+
+      <!-- RESERVATIONS (sticky + dates compactes) -->
+      <div class="card sticky">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:900">Locations enregistrées</div>
+            <div class="note">Toujours visible · scroll dans la liste</div>
+          </div>
+          <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="scrollBox">
+          <div class="table">
+            <div class="thead loc">
+              <div>N° affaire</div>
+              <div>Début</div>
+              <div>Fin</div>
+              <div class="right">Masse</div>
+              <div class="right">Type</div>
+              <div class="right">Suppr.</div>
+            </div>
+            <div id="locRows"></div>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:10px">
+          Les dates sont affichées en format JJ/MM/AAAA pour une lecture plus rapide.
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -374,6 +423,16 @@
     return new Date(Date.UTC(y,m-1,d));
   }
 
+  function fmtDateFR(iso){
+    // iso yyyy-mm-dd -> dd/mm/yyyy
+    const d = parseDateISO(iso);
+    if(!d) return "—";
+    const dd = String(d.getUTCDate()).padStart(2,"0");
+    const mm = String(d.getUTCMonth()+1).padStart(2,"0");
+    const yy = String(d.getUTCFullYear());
+    return `${dd}/${mm}/${yy}`;
+  }
+
   function overlaps(aStart, aEnd, bStart, bEnd){
     return !(aEnd < bStart || aStart > bEnd); // inclusif
   }
@@ -398,7 +457,6 @@
   // Manutention auto selon masse
   function requiredHandlingItems(masseKg){
     if(masseKg == null) return { label: "—", items:{} };
-
     const t = masseKg / 1000;
     if(t <= 10){
       return { label: "≤10t : petit timon (10t)", items: { "petit timon": 1 } };
@@ -406,7 +464,6 @@
     if(t <= 20){
       return { label: "10–20t : grand timon (20t)", items: { "grand timon": 1 } };
     }
-    // >20t : châssis dans la nomenclature + grand timon
     return { label: ">20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
   }
 
@@ -414,7 +471,6 @@
     const s = parseDateISO(startIso);
     const e = parseDateISO(endIso);
     const reserved = Object.create(null);
-
     if(!s || !e || e < s) return reserved;
 
     const locations = loadLocations();
@@ -552,7 +608,6 @@
     trAR: document.getElementById("trAR"),
 
     locRows: document.getElementById("locRows"),
-
     clearAllBtn: document.getElementById("clearAllBtn"),
   };
 
@@ -585,13 +640,14 @@
       els.locRows.innerHTML = `<div class="trow loc"><div class="muted" style="grid-column:1 / span 6">—</div></div>`;
       return;
     }
+
     els.locRows.innerHTML = locs.map(l => `
       <div class="trow loc">
-        <div style="font-weight:950">${l.affaire || "—"}</div>
-        <div>${l.start || "—"}</div>
-        <div>${l.end || "—"}</div>
-        <div class="right">${NF(l.masseKg)} kg</div>
-        <div class="right">${l.typeCamion || "—"}</div>
+        <div class="affaireCell" title="${l.affaire || ""}">${l.affaire || "—"}</div>
+        <div class="dateCell">${fmtDateFR(l.start)}</div>
+        <div class="dateCell">${fmtDateFR(l.end)}</div>
+        <div class="right massCell">${NF(l.masseKg)} kg</div>
+        <div class="right typeCell">${l.typeCamion || "—"}</div>
         <div class="right">
           <button class="dangerBtn" data-del="${l.id}" type="button">✕</button>
         </div>
@@ -617,7 +673,6 @@
     const typeCamion = els.typeCamion.value;
 
     const jours = businessDaysInclusive(d1, d2);
-
     const manut = requiredHandlingItems(masse);
     els.kpiManut.textContent = manut.label;
 
@@ -649,17 +704,18 @@
     // Total
     const total = (locMin==null || trAR==null) ? null : locMin + trAR;
 
-    els.locBrut.textContent = EUR(locBrut);
-    els.locMin.textContent  = EUR(locMin);
-    els.trAller.textContent = EUR(trAller);
-    els.trAR.textContent    = EUR(trAR);
-    els.kpiTotal.textContent= EUR(total);
+    document.getElementById("locBrut").textContent = EUR(locBrut);
+    document.getElementById("locMin").textContent  = EUR(locMin);
+    document.getElementById("trAller").textContent = EUR(trAller);
+    document.getElementById("trAR").textContent    = EUR(trAR);
+    document.getElementById("kpiTotal").textContent= EUR(total);
 
     // Résumé
     if(total==null){
-      els.resume.textContent = "Renseigne masse, dates et département pour obtenir un total.";
+      document.getElementById("resume").textContent = "Renseigne masse, dates et département pour obtenir un total.";
     } else {
-      els.resume.textContent = `Pour ${NF(masse)} kg sur ${jours} jour(s) ouvré(s) en ${dep} (${typeCamion}) · Tarif ${NF2(tarif)} €/kg/j`;
+      document.getElementById("resume").textContent =
+        `Pour ${NF(masse)} kg sur ${jours} jour(s) ouvré(s) en ${dep} (${typeCamion}) · Tarif ${NF2(tarif)} €/kg/j`;
     }
 
     // Stock sur période (déduit locations enregistrées)
@@ -683,9 +739,9 @@
 
     const combined = [...(plan.handlingLines||[]), ...(plan.lignes||[])];
     els.prepRows.innerHTML = combined.length === 0
-      ? `<div class="trow"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
+      ? `<div class="trow prep"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
       : combined.map(l => `
-          <div class="trow">
+          <div class="trow prep">
             <div>${l.ref}${l.isHandling ? ' <span class="badge" style="margin-left:8px">Manutention</span>' : ""}</div>
             <div class="right" style="font-weight:950">${NF(l.qte)}</div>
             <div class="right" style="color:rgba(15,23,42,.70)">${NF(l.poidsKg)} kg</div>
@@ -712,39 +768,30 @@
   }
 
   // Valider / enregistrer
-  els.saveBtn.addEventListener("click", () => {
-    const affaire = String(els.affaire.value || "").trim();
+  document.getElementById("saveBtn").addEventListener("click", () => {
+    const affaire = String(document.getElementById("affaire").value || "").trim();
     const masse = getMasseKgNum();
     const tarif = getTarifNum();
-    const d1 = els.dateDebut.value;
-    const d2 = els.dateFin.value;
-    const dep = els.departement.value;
-    const typeCamion = els.typeCamion.value;
+    const d1 = document.getElementById("dateDebut").value;
+    const d2 = document.getElementById("dateFin").value;
+    const dep = document.getElementById("departement").value;
+    const typeCamion = document.getElementById("typeCamion").value;
 
     const jours = businessDaysInclusive(d1, d2);
 
-    if(!affaire){
-      alert("Merci de renseigner un N° d’affaire avant de valider.");
-      return;
-    }
-    if(masse == null || tarif == null || !d1 || !d2 || !dep){
-      alert("Merci de renseigner : masse, dates, département (et un tarif valide).");
-      return;
-    }
-    if(jours == null){
-      alert("Dates invalides (fin avant début).");
-      return;
-    }
+    if(!affaire){ alert("Merci de renseigner un N° d’affaire avant de valider."); return; }
+    if(masse == null || tarif == null || !d1 || !d2 || !dep){ alert("Merci de renseigner : masse, dates, département (et un tarif valide)."); return; }
+    if(jours == null){ alert("Dates invalides (fin avant début)."); return; }
 
     const massesDisponibles = getAvailableMasses(d1, d2);
     const manut = requiredHandlingItems(masse);
     const plan = computeDecomposition(masse, massesDisponibles, manut.items);
 
     if(!plan.ok){
-      if(!confirm("Le stock masses semble insuffisant pour atteindre la masse demandée sur ces dates. Enregistrer quand même ?")) return;
+      if(!confirm("Le stock masses semble insuffisant sur ces dates. Enregistrer quand même ?")) return;
     }
     if(!plan.handlingOk){
-      if(!confirm("Le matériel de manutention requis (timon/châssis) semble indisponible sur ces dates. Enregistrer quand même ?")) return;
+      if(!confirm("Manutention (timon/châssis) indisponible sur ces dates. Enregistrer quand même ?")) return;
     }
 
     const items = {
@@ -770,13 +817,13 @@
     });
 
     saveLocations(locs);
-    els.affaire.value = "";
+    document.getElementById("affaire").value = "";
     render();
-    alert("Location enregistrée ✅ Le stock est maintenant mis à jour sur la période.");
+    alert("Location enregistrée ✅ Stock mis à jour.");
   });
 
   // Tout effacer
-  els.clearAllBtn.addEventListener("click", () => {
+  document.getElementById("clearAllBtn").addEventListener("click", () => {
     if(confirm("Supprimer TOUTES les locations enregistrées sur ce poste ?")) {
       localStorage.removeItem(STORAGE_KEY);
       render();
@@ -784,32 +831,36 @@
   });
 
   // Reset
-  els.resetBtn.addEventListener("click", () => {
-    els.masseKg.value = "";
-    els.dateDebut.value = "";
-    els.dateFin.value = "";
-    els.departement.value = "";
-    els.typeCamion.value = "Complet";
-    els.tarifKgJour.value = "0.05";
-    els.affaire.value = "";
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    document.getElementById("masseKg").value = "";
+    document.getElementById("dateDebut").value = "";
+    document.getElementById("dateFin").value = "";
+    document.getElementById("departement").value = "";
+    document.getElementById("typeCamion").value = "Complet";
+    document.getElementById("tarifKgJour").value = "0.05";
+    document.getElementById("affaire").value = "";
     render();
   });
 
   // Re-render on input
   ["input","change"].forEach(evt=>{
-    els.masseKg.addEventListener(evt,render);
-    els.tarifKgJour.addEventListener(evt,render);
-    els.dateDebut.addEventListener(evt,render);
-    els.dateFin.addEventListener(evt,render);
-    els.departement.addEventListener(evt,render);
-    els.typeCamion.addEventListener(evt,render);
+    document.getElementById("masseKg").addEventListener(evt,render);
+    document.getElementById("tarifKgJour").addEventListener(evt,render);
+    document.getElementById("dateDebut").addEventListener(evt,render);
+    document.getElementById("dateFin").addEventListener(evt,render);
+    document.getElementById("departement").addEventListener(evt,render);
+    document.getElementById("typeCamion").addEventListener(evt,render);
   });
 
-  // Init
-  render();
+  // Init départements + defaults
+  (function init(){
+    const keys = Object.keys(TARIFS);
+    document.getElementById("departement").innerHTML =
+      `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
+    document.getElementById("tarifKgJour").value = "0.05";
+    render();
+  })();
 </script>
 </body>
 </html>
 
-</body>
-</html>
