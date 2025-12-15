@@ -6,356 +6,249 @@
   <title>Configurateur – location masses d’essai</title>
   <style>
     :root{
-      --bg:#ffffff;
-      --card:#ffffff;
-      --muted:#5b6475;
-      --text:#0f172a;
-      --line:rgba(2,6,23,.12);
-      --accent:#2563eb;
-      --good:#16a34a;
-      --warn:#f59e0b;
-      --danger:#dc2626;
-      --soft:#f3f4f6;
+      --bg:#f8fafc; --card:#fff; --line:rgba(2,6,23,.12);
+      --text:#0f172a; --muted:#64748b; --accent:#2563eb;
+      --good:#16a34a; --warn:#f59e0b; --danger:#dc2626; --soft:#f1f5f9;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:linear-gradient(180deg,#ffffff, #f8fafc 60%, #ffffff);
-      color:var(--text);
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    }
-    .wrap{max-width:1400px;margin:0 auto;padding:18px}
-    h1{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}
-    p.sub{margin:0 0 14px;color:var(--muted);max-width:1100px}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1600px;margin:0 auto;padding:16px}
+    h1{margin:0 0 6px;font-size:26px}
+    .sub{margin:0 0 12px;color:var(--muted);max-width:1200px}
 
-    /* Layout global : 3 colonnes desktop (params / résultat / réservations) */
-    .layout{display:grid;grid-template-columns:1fr;gap:14px}
-    @media(min-width:1200px){
-      .layout{
-        grid-template-columns: 360px minmax(520px, 1fr) 420px;
-        align-items:start;
-      }
-    }
+    .layout{display:grid;gap:14px}
+    @media(min-width:1250px){ .layout{grid-template-columns:360px 520px 520px;align-items:start} }
+    @media(max-width:1249px){ .layout{grid-template-columns:1fr 1fr} }
+    @media(max-width:900px){ .layout{grid-template-columns:1fr} }
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
-      box-shadow:0 10px 30px rgba(2,6,23,.06);
-    }
-
-    .row{display:grid;grid-template-columns:1fr;gap:10px}
-    @media(min-width:520px){.row.two{grid-template-columns:1fr 1fr}}
-
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 26px rgba(2,6,23,.06)}
     label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
-    input,select{
-      width:100%; padding:10px 12px; border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff; color:var(--text); outline:none;
-    }
-    input:focus,select:focus{border-color:rgba(37,99,235,.5); box-shadow:0 0 0 4px rgba(37,99,235,.12)}
-    input::placeholder{color:rgba(15,23,42,.35)}
-
-    .pill{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .kpi{
-      flex:1;min-width:170px;background:var(--soft);
-      border:1px solid var(--line);border-radius:14px;padding:12px
-    }
-    .kpi .t{font-size:12px;color:var(--muted)}
-    .kpi .v{font-size:18px;font-weight:850;margin-top:4px}
-
+    input,select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;outline:none}
+    .row{display:grid;gap:10px}
+    .row.two{grid-template-columns:1fr 1fr}
     .sep{height:1px;background:var(--line);margin:12px 0}
 
+    .kpi{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px}
+    .kpi .t{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:18px;font-weight:900;margin-top:4px}
+
     .table{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
-    .thead,.trow{display:grid;gap:10px;align-items:center}
-    .thead{background:#f8fafc;padding:9px 10px;font-size:12px;color:var(--muted)}
-    .trow{padding:9px 10px;border-top:1px solid var(--line);font-size:14px}
+    .thead,.trow{display:grid;gap:8px;align-items:center;padding:9px 10px}
+    .thead{background:#f8fafc;font-size:12px;color:var(--muted)}
+    .trow{border-top:1px solid var(--line);font-size:14px}
     .right{text-align:right}
+    .note{font-size:12px;color:var(--muted);line-height:1.35}
 
     .thead.stock,.trow.stock{grid-template-columns: 5fr 2fr 2fr 2fr 1fr}
     .thead.prep,.trow.prep{grid-template-columns: 6fr 2fr 2fr 2fr}
-    .thead.loc,.trow.loc{
-      grid-template-columns: 2.2fr 1.3fr 1.3fr 1.2fr 1fr 46px;
-      gap:8px;
+    .thead.loc,.trow.loc{grid-template-columns: 1.6fr 100px 100px 110px 90px 46px}
+
+    .affaire{font-weight:900;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2}
+    .dateCell{white-space:nowrap;font-variant-numeric:tabular-nums}
+    .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;color:var(--muted);background:#fff}
+
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    button{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    button.dangerBtn{border-color:rgba(220,38,38,.35);color:var(--danger)}
+
+    .sticky{position:sticky;top:14px}
+    @media(min-width:1250px){
+      .resultPanel{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;padding-right:6px}
+      .resultPanel::-webkit-scrollbar{width:10px}
+      .resultPanel::-webkit-scrollbar-thumb{background:rgba(2,6,23,.18);border-radius:999px;border:3px solid rgba(255,255,255,.7)}
+      .scrollBox{max-height:calc(100vh - 170px);overflow:auto}
+      .scrollBox::-webkit-scrollbar{width:10px}
+      .scrollBox::-webkit-scrollbar-thumb{background:rgba(2,6,23,.18);border-radius:999px;border:3px solid rgba(255,255,255,.7)}
     }
 
-    .note{font-size:12px;color:var(--muted);line-height:1.35}
     .warn{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.10);border-radius:14px;padding:10px 12px}
     .good{border:1px solid rgba(22,163,74,.35);background:rgba(22,163,74,.10);border-radius:14px;padding:10px 12px}
     .danger{border:1px solid rgba(220,38,38,.35);background:rgba(220,38,38,.08);border-radius:14px;padding:10px 12px}
-
-    .btns{display:flex;gap:10px;flex-wrap:wrap}
-    button{
-      padding:10px 12px;border-radius:12px;border:1px solid var(--line);
-      background:#fff; color:var(--text); cursor:pointer
-    }
-    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-    button.primary:hover{filter:brightness(.95)}
-    button.dangerBtn{background:#fff;border-color:rgba(220,38,38,.35);color:var(--danger)}
-    button.dangerBtn:hover{border-color:rgba(220,38,38,.60)}
-
-    .big{font-size:22px;font-weight:950}
-    .muted{color:var(--muted)}
-    .badge{
-      display:inline-flex;align-items:center;gap:6px;
-      border:1px solid var(--line); background:#fff; border-radius:999px;
-      padding:6px 10px; font-size:12px; color:var(--muted)
-    }
-
-    /* --- Sticky réservations à droite --- */
-    .sticky{position:sticky; top:14px}
-
-    /* --- IMPORTANT : Résultats visibles sans scroller la page --- */
-    @media(min-width:1200px){
-      .resultPanel{
-        position: sticky;
-        top: 14px;
-        max-height: calc(100vh - 28px); /* hauteur écran */
-        overflow: auto;                 /* scroll interne */
-        padding-right: 6px;
-      }
-      .resultPanel::-webkit-scrollbar{ width:10px; }
-      .resultPanel::-webkit-scrollbar-thumb{
-        background:rgba(2,6,23,.18);
-        border-radius:999px;
-        border:3px solid rgba(255,255,255,.7);
-      }
-    }
-
-    /* --- Scroll interne réservations --- */
-    .scrollBox{
-      max-height: calc(100vh - 170px);
-      overflow:auto;
-    }
-    .scrollBox::-webkit-scrollbar{ width:10px; }
-    .scrollBox::-webkit-scrollbar-thumb{
-      background:rgba(2,6,23,.18);
-      border-radius:999px;
-      border:3px solid rgba(255,255,255,.7);
-    }
-
-    /* Dates en une ligne, style compact */
-    .dateCell{white-space:nowrap; font-variant-numeric: tabular-nums}
-    .affaireCell{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .massCell{white-space:nowrap}
-    .typeCell{white-space:nowrap}
-
-    /* Petites améliorations visuelles */
-    .sectionTitle{font-weight:900;margin-bottom:8px}
-    .sectionTitle small{font-weight:600;color:var(--muted)}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>Configurateur – location masses d’essai</h1>
-    <p class="sub">
-      Calcul automatique : <b>jours ouvrés</b> (week-end exclu), location (tarif modifiable), transport, préparation + manutention, stock dispo selon les réservations enregistrées.
-    </p>
+<div class="wrap">
+  <h1>Configurateur – location masses d’essai</h1>
+  <p class="sub">Multi-poste : réservations partagées via Google Sheets · Jours ouvrés (week-end exclu) · Stock dispo recalculé selon chevauchement de dates.</p>
 
-    <div class="layout">
-
-      <!-- PARAMÈTRES -->
-      <div class="card">
-        <div class="row two">
-          <div>
-            <label for="masseKg">Masse totale demandée (kg)</label>
-            <input id="masseKg" inputmode="decimal" placeholder="Ex : 12000" />
-          </div>
-          <div>
-            <label for="typeCamion">Type de camion</label>
-            <select id="typeCamion">
-              <option value="6M">6M</option>
-              <option value="9M">9M</option>
-              <option value="Complet" selected>Complet</option>
-            </select>
-          </div>
+  <div class="layout">
+    <!-- PARAMETRES -->
+    <div class="card">
+      <div class="row two">
+        <div>
+          <label for="masseKg">Masse totale demandée (kg)</label>
+          <input id="masseKg" inputmode="decimal" placeholder="Ex : 12000"/>
         </div>
-
-        <div class="row two" style="margin-top:10px">
-          <div>
-            <label for="dateDebut">Date début</label>
-            <input id="dateDebut" type="date" />
-          </div>
-          <div>
-            <label for="dateFin">Date fin</label>
-            <input id="dateFin" type="date" />
-          </div>
-        </div>
-
-        <div class="row two" style="margin-top:10px">
-          <div>
-            <label for="departement">Département de livraison</label>
-            <select id="departement"></select>
-          </div>
-          <div>
-            <label for="tarifKgJour">Tarif location (€/kg/jour)</label>
-            <input id="tarifKgJour" type="number" step="0.001" min="0" />
-          </div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div class="row">
-          <div>
-            <label for="affaire">N° d’affaire (obligatoire pour valider)</label>
-            <input id="affaire" placeholder="Ex : AFF-2025-014" />
-          </div>
-        </div>
-
-        <div class="pill">
-          <div class="kpi">
-            <div class="t">Durée (jours ouvrés)</div>
-            <div class="v" id="kpiDuree">—</div>
-            <div class="note">(Lun→Ven, inclusif, min 1)</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Minimum location</div>
-            <div class="v">250,00 €</div>
-            <div class="note">forfait mini</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Manutention (auto)</div>
-            <div class="v"><span class="badge" id="kpiManut">—</span></div>
-            <div class="note">≤10t / 10–20t / >20t</div>
-          </div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div class="btns">
-          <button id="resetBtn" type="button">Réinitialiser</button>
-          <button id="saveBtn" type="button" class="primary">Valider / enregistrer</button>
-        </div>
-
-        <div class="note" style="margin-top:10px">
-          Les locations sont enregistrées sur ce poste (LocalStorage). Le stock “dispo” se met à jour automatiquement selon les chevauchements.
+        <div>
+          <label for="typeCamion">Type de camion</label>
+          <select id="typeCamion">
+            <option value="6M">6M</option>
+            <option value="9M">9M</option>
+            <option value="Complet" selected>Complet</option>
+          </select>
         </div>
       </div>
 
-      <!-- RESULTATS (sticky + scroll interne) -->
-      <div class="card resultPanel">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
-          <div>
-            <div class="muted" style="font-size:12px">Total offre (HT)</div>
-            <div class="big" id="kpiTotal">—</div>
-          </div>
-          <div class="muted" id="resume" style="font-size:12px;max-width:560px;text-align:right"></div>
+      <div class="row two" style="margin-top:10px">
+        <div>
+          <label for="dateDebut">Date début</label>
+          <input id="dateDebut" type="date"/>
         </div>
-
-        <div class="sep"></div>
-        <div id="alerts"></div>
-
-        <div style="margin-top:12px">
-          <div class="sectionTitle">Stock dispo sur la période <small>(réservations déduites)</small></div>
-          <div class="table">
-            <div class="thead stock">
-              <div>Type</div>
-              <div class="right">Stock</div>
-              <div class="right">Réservé</div>
-              <div class="right">Dispo</div>
-              <div class="right">OK</div>
-            </div>
-            <div id="stockRows"></div>
-          </div>
-          <div class="note" style="margin-top:8px">
-            “Réservé” = total des locations enregistrées qui chevauchent tes dates.
-          </div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div style="margin-top:12px">
-          <div class="sectionTitle">Préparation <small>(décomposition + manutention auto)</small></div>
-          <div class="table" id="prepTable">
-            <div class="thead prep">
-              <div>Type de masse</div>
-              <div class="right">Qté</div>
-              <div class="right">Unitaire</div>
-              <div class="right">Total</div>
-            </div>
-            <div id="prepRows"></div>
-            <div class="trow prep" style="background:#f8fafc">
-              <div class="muted" style="grid-column:1 / span 3">Total préparé (masses seules, hors manutention)</div>
-              <div class="right" style="font-weight:950" id="prepTotal">—</div>
-            </div>
-          </div>
-          <div id="prepMsg" style="margin-top:10px"></div>
-        </div>
-
-        <div class="sep"></div>
-
-        <!-- ICI : la partie que tu ne voyais pas => maintenant accessible via scroll interne du panneau -->
-        <div class="row">
-          <div class="kpi">
-            <div class="t">Location (brut)</div>
-            <div class="v" id="locBrut">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Location (min 250€ appliqué)</div>
-            <div class="v" id="locMin">—</div>
-          </div>
-        </div>
-
-        <div class="row two" style="margin-top:10px">
-          <div class="kpi">
-            <div class="t">Transport (aller simple)</div>
-            <div class="v" id="trAller">—</div>
-          </div>
-          <div class="kpi">
-            <div class="t">Transport (aller/retour)</div>
-            <div class="v" id="trAR">—</div>
-          </div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div class="note">
-          Astuce : sur PC, ce panneau “Résultats” reste visible et scrolle dans lui-même (pas besoin de scroller la page).
+        <div>
+          <label for="dateFin">Date fin</label>
+          <input id="dateFin" type="date"/>
         </div>
       </div>
 
-      <!-- RESERVATIONS (sticky + dates compactes) -->
-      <div class="card sticky">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
-          <div>
-            <div style="font-weight:900">Locations enregistrées</div>
-            <div class="note">Toujours visible · scroll dans la liste</div>
-          </div>
-          <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
+      <div class="row two" style="margin-top:10px">
+        <div>
+          <label for="departement">Département de livraison</label>
+          <select id="departement"></select>
         </div>
-
-        <div class="sep"></div>
-
-        <div class="scrollBox">
-          <div class="table">
-            <div class="thead loc">
-              <div>N° affaire</div>
-              <div>Début</div>
-              <div>Fin</div>
-              <div class="right">Masse</div>
-              <div class="right">Type</div>
-              <div class="right">Suppr.</div>
-            </div>
-            <div id="locRows"></div>
-          </div>
-        </div>
-
-        <div class="note" style="margin-top:10px">
-          Les dates sont affichées en format JJ/MM/AAAA pour une lecture plus rapide.
+        <div>
+          <label for="tarifKgJour">Tarif location (€/kg/jour)</label>
+          <input id="tarifKgJour" type="number" step="0.001" min="0"/>
         </div>
       </div>
 
+      <div class="row two" style="margin-top:10px">
+        <div>
+          <label for="manutention">Manutention</label>
+          <select id="manutention">
+            <option value="sans">Sans</option>
+            <option value="petit">Petit timon</option>
+            <option value="grand">Grand timon</option>
+            <option value="chassis">Châssis</option>
+          </select>
+        </div>
+        <div>
+          <label for="affaire">N° d’affaire</label>
+          <input id="affaire" placeholder="Ex : AFF-2025-014"/>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="kpi">
+          <div class="t">Durée (jours ouvrés)</div>
+          <div class="v" id="kpiDuree">—</div>
+          <div class="note">(Lun→Ven, inclusif, min 1)</div>
+        </div>
+      </div>
+
+      <div class="row two" style="margin-top:10px">
+        <div class="kpi">
+          <div class="t">Minimum location</div>
+          <div class="v">250,00 €</div>
+          <div class="note">forfait mini</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Suggestion manutention</div>
+          <div class="v"><span class="badge" id="kpiManutHint">—</span></div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+      <div class="btns">
+        <button id="resetBtn" type="button">Réinitialiser</button>
+        <button id="saveBtn" type="button" class="primary">Valider / enregistrer</button>
+      </div>
+
+      <div class="note" style="margin-top:10px">
+        Les réservations sont partagées (multi-poste). Si deux personnes valident en même temps, le stock est recalculé sur la base commune.
+      </div>
+    </div>
+
+    <!-- RESULTATS -->
+    <div class="card resultPanel">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <div class="note">Total offre (HT)</div>
+          <div style="font-size:26px;font-weight:950" id="kpiTotal">—</div>
+        </div>
+        <div class="note" id="resume" style="max-width:520px;text-align:right"></div>
+      </div>
+
+      <div class="sep"></div>
+      <div id="alerts"></div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:950;margin-bottom:8px">Stock dispo sur la période</div>
+        <div class="table">
+          <div class="thead stock">
+            <div>Type</div><div class="right">Stock</div><div class="right">Réservé</div><div class="right">Dispo</div><div class="right">OK</div>
+          </div>
+          <div id="stockRows"></div>
+        </div>
+        <div class="note" style="margin-top:8px">Réservé = total des réservations communes qui chevauchent tes dates.</div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:950;margin-bottom:8px">Préparation (décomposition + manutention)</div>
+        <div class="table">
+          <div class="thead prep">
+            <div>Type</div><div class="right">Qté</div><div class="right">Unitaire</div><div class="right">Total</div>
+          </div>
+          <div id="prepRows"></div>
+          <div class="trow prep" style="background:#f8fafc">
+            <div class="note" style="grid-column:1/span 3">Total préparé (masses seules, hors manutention)</div>
+            <div class="right" style="font-weight:950" id="prepTotal">—</div>
+          </div>
+        </div>
+        <div id="prepMsg" style="margin-top:10px"></div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row two">
+        <div class="kpi"><div class="t">Location (brut)</div><div class="v" id="locBrut">—</div></div>
+        <div class="kpi"><div class="t">Location (min 250€)</div><div class="v" id="locMin">—</div></div>
+      </div>
+      <div class="row two" style="margin-top:10px">
+        <div class="kpi"><div class="t">Transport (aller simple)</div><div class="v" id="trAller">—</div></div>
+        <div class="kpi"><div class="t">Transport (aller/retour)</div><div class="v" id="trAR">—</div></div>
+      </div>
+    </div>
+
+    <!-- RESERVATIONS -->
+    <div class="card sticky">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:950">Locations enregistrées</div>
+          <div class="note">Base partagée (multi-poste)</div>
+        </div>
+        <button id="clearAllBtn" class="dangerBtn" type="button">Tout effacer</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="scrollBox">
+        <div class="table">
+          <div class="thead loc">
+            <div>N° affaire</div><div>Début</div><div>Fin</div><div class="right">Masse</div><div class="right">Type</div><div class="right">✕</div>
+          </div>
+          <div id="locRows"></div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:10px">Astuce : survol du N° d’affaire pour voir le texte complet.</div>
     </div>
   </div>
+</div>
 
 <script>
-  // ======= PARAMÈTRES =======
-  const STORAGE_KEY = "masses_locations_v1";
+  // ========= CONFIG MULTI-POSTE =========
+  // Colle ici l’URL du déploiement Apps Script (Web App)
+  const API_URL = "PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
+
   const MIN_LOCATION = 250;
 
-  // Stock (issu de ton XLS) : poids unitaires (kg) + quantité totale
+  // Stock (issu de ton XLS)
   const MASSES = [
     { ref: "orange", poidsKg: 2500, dispo: 8 },
     { ref: "jaune", poidsKg: 2000, dispo: 1 },
@@ -364,11 +257,11 @@
     { ref: "bleu", poidsKg: 200, dispo: 3 },
     { ref: "noir", poidsKg: 25, dispo: 26 },
     { ref: "châssis (chaîne incluse)", poidsKg: 2500, dispo: 1 },
-    { ref: "petit timon", poidsKg: 56, dispo: 1 },   // timon 10t
-    { ref: "grand timon", poidsKg: 200, dispo: 1 },  // timon 20t
+    { ref: "petit timon", poidsKg: 56, dispo: 1 },
+    { ref: "grand timon", poidsKg: 200, dispo: 1 },
   ];
 
-  // Transport (aller simple). Aller/retour = x2. Colonnes = type de camion.
+  // Transport (aller simple). A/R = x2.
   const TARIFS = {
     "14": { "6M": 425, "9M": 495, "Complet": 525 },
     "17": { "6M": 413, "9M": 480, "Complet": 512 },
@@ -394,27 +287,40 @@
     "85": { "6M": 385, "9M": 401, "Complet": 425 },
   };
 
-  // ======= STORAGE =======
-  function loadLocations(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr : [];
-    } catch { return []; }
+  // ========= API =========
+  async function apiList(){
+    const r = await fetch(`${API_URL}?action=list`, { method:"GET" });
+    return r.json();
   }
-  function saveLocations(arr){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  async function apiCreate(payload){
+    const r = await fetch(API_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ action:"create", ...payload })
+    });
+    return r.json();
+  }
+  async function apiDelete(id){
+    const r = await fetch(API_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ action:"delete", id })
+    });
+    return r.json();
+  }
+  async function apiClear(){
+    const r = await fetch(API_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ action:"clear" })
+    });
+    return r.json();
   }
 
-  // ======= HELPERS =======
-  const EUR = (n) => (n==null || Number.isNaN(n)) ? "—" :
-    new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n);
-
-  const NF = (n) => (n==null || Number.isNaN(n)) ? "—" :
-    new Intl.NumberFormat("fr-FR",{maximumFractionDigits:0}).format(n);
-
-  const NF2 = (n) => (n==null || Number.isNaN(n)) ? "—" :
-    new Intl.NumberFormat("fr-FR",{maximumFractionDigits:2}).format(n);
+  // ========= Helpers =========
+  const EUR = (n) => (n==null || Number.isNaN(n)) ? "—" : new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n);
+  const NF0 = (n) => (n==null || Number.isNaN(n)) ? "—" : new Intl.NumberFormat("fr-FR",{maximumFractionDigits:0}).format(n);
+  const NF2 = (n) => (n==null || Number.isNaN(n)) ? "—" : new Intl.NumberFormat("fr-FR",{maximumFractionDigits:2}).format(n);
 
   function parseDateISO(s){
     if(!s) return null;
@@ -422,9 +328,7 @@
     if(!y||!m||!d) return null;
     return new Date(Date.UTC(y,m-1,d));
   }
-
   function fmtDateFR(iso){
-    // iso yyyy-mm-dd -> dd/mm/yyyy
     const d = parseDateISO(iso);
     if(!d) return "—";
     const dd = String(d.getUTCDate()).padStart(2,"0");
@@ -432,40 +336,43 @@
     const yy = String(d.getUTCFullYear());
     return `${dd}/${mm}/${yy}`;
   }
-
   function overlaps(aStart, aEnd, bStart, bEnd){
-    return !(aEnd < bStart || aStart > bEnd); // inclusif
+    return !(aEnd < bStart || aStart > bEnd);
   }
-
-  // Jours ouvrés (week-end exclu)
   function businessDaysInclusive(startIso, endIso){
     const s = parseDateISO(startIso);
     const e = parseDateISO(endIso);
     if(!s || !e) return null;
     if(e < s) return null;
-
     let count = 0;
     const d = new Date(s.getTime());
     while(d <= e){
-      const dow = d.getUTCDay(); // 0=Dim, 6=Sam
+      const dow = d.getUTCDay();
       if(dow !== 0 && dow !== 6) count++;
       d.setUTCDate(d.getUTCDate() + 1);
     }
     return Math.max(1, count);
   }
 
-  // Manutention auto selon masse
-  function requiredHandlingItems(masseKg){
-    if(masseKg == null) return { label: "—", items:{} };
-    const t = masseKg / 1000;
-    if(t <= 10){
-      return { label: "≤10t : petit timon (10t)", items: { "petit timon": 1 } };
-    }
-    if(t <= 20){
-      return { label: "10–20t : grand timon (20t)", items: { "grand timon": 1 } };
-    }
-    return { label: ">20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
+  // Suggestion (mais choix manuel)
+  function suggestionManut(masseKg){
+    if(masseKg == null) return "—";
+    const t = masseKg/1000;
+    if(t <= 10) return "Petit timon conseillé (≤10t)";
+    if(t <= 20) return "Grand timon conseillé (10–20t)";
+    return "Châssis conseillé (>20t)";
   }
+
+  function selectedManutItems(sel){
+    // Choix demandé : sans / petit timon / grand timon / chassis (un seul)
+    if(sel === "petit") return { "petit timon": 1 };
+    if(sel === "grand") return { "grand timon": 1 };
+    if(sel === "chassis") return { "châssis (chaîne incluse)": 1 };
+    return {};
+  }
+
+  // ========= Stock & réservation =========
+  let reservationsCache = []; // données partagées
 
   function getReservedMap(startIso, endIso){
     const s = parseDateISO(startIso);
@@ -473,14 +380,13 @@
     const reserved = Object.create(null);
     if(!s || !e || e < s) return reserved;
 
-    const locations = loadLocations();
-    for(const r of locations){
+    for(const r of reservationsCache){
       const rs = parseDateISO(r.start);
       const re = parseDateISO(r.end);
       if(!rs || !re) continue;
       if(!overlaps(s, e, rs, re)) continue;
-
-      for(const [ref, qty] of Object.entries(r.items || {})){
+      const items = r.items || {};
+      for(const [ref, qty] of Object.entries(items)){
         reserved[ref] = (reserved[ref] || 0) + (Number(qty) || 0);
       }
     }
@@ -489,34 +395,31 @@
 
   function getAvailableMasses(startIso, endIso){
     const reserved = getReservedMap(startIso, endIso);
-    return MASSES
-      .map(m => {
-        const res = reserved[m.ref] || 0;
-        const dispo = Math.max(0, (m.dispo || 0) - res);
-        return { ...m, reserved: res, dispoRestante: dispo };
-      })
-      .sort((a,b)=> b.poidsKg - a.poidsKg);
+    return MASSES.map(m => {
+      const res = reserved[m.ref] || 0;
+      const dispoRestante = Math.max(0, (m.dispo||0) - res);
+      return { ...m, reserved: res, dispoRestante };
+    }).sort((a,b)=>b.poidsKg - a.poidsKg);
   }
 
   function computeDecomposition(masseDemandeeKg, massesDisponibles, handlingItems){
     if(masseDemandeeKg == null) return { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] };
 
-    // 1) Réserve la manutention en priorité (déduit du stock restant)
     const mapAvail = new Map(massesDisponibles.map(m => [m.ref, { ...m }]));
     const handlingLines = [];
     let handlingOk = true;
 
+    // Déduire la manutention choisie du stock
     for(const [ref, qty] of Object.entries(handlingItems || {})){
       const m = mapAvail.get(ref);
       const dispo = m ? (m.dispoRestante ?? 0) : 0;
       if(dispo < qty) handlingOk = false;
       if(m) m.dispoRestante = Math.max(0, dispo - qty);
-
       const poidsKg = m ? m.poidsKg : 0;
       handlingLines.push({ ref, qte: qty, poidsKg, sousTotalKg: qty * poidsKg, isHandling:true });
     }
 
-    // 2) Décomposition des masses (hors manutention)
+    // Décomposition masses
     let reste = Math.max(0, Math.round(masseDemandeeKg));
     const lignes = [];
     const massesSorted = [...mapAvail.values()].sort((a,b)=>b.poidsKg - a.poidsKg);
@@ -560,13 +463,7 @@
     const lignesTriees = lignes.filter(l=>l.qte>0).sort((a,b)=>b.poidsKg - a.poidsKg);
     const totalKg = lignesTriees.reduce((s,l)=>s+l.sousTotalKg,0);
 
-    return {
-      lignes: lignesTriees,
-      totalKg,
-      ok: totalKg >= Math.round(masseDemandeeKg),
-      handlingOk,
-      handlingLines: handlingLines.filter(l=>l.qte>0),
-    };
+    return { lignes: lignesTriees, totalKg, ok: totalKg >= Math.round(masseDemandeeKg), handlingOk, handlingLines };
   }
 
   function linesToItemsMap(lines){
@@ -577,292 +474,236 @@
     return map;
   }
 
-  // ======= UI =======
+  // ========= UI =========
+  const el = (id)=>document.getElementById(id);
   const els = {
-    masseKg: document.getElementById("masseKg"),
-    dateDebut: document.getElementById("dateDebut"),
-    dateFin: document.getElementById("dateFin"),
-    departement: document.getElementById("departement"),
-    typeCamion: document.getElementById("typeCamion"),
-    tarifKgJour: document.getElementById("tarifKgJour"),
-    affaire: document.getElementById("affaire"),
-
-    resetBtn: document.getElementById("resetBtn"),
-    saveBtn: document.getElementById("saveBtn"),
-
-    kpiDuree: document.getElementById("kpiDuree"),
-    kpiTotal: document.getElementById("kpiTotal"),
-    resume: document.getElementById("resume"),
-    kpiManut: document.getElementById("kpiManut"),
-
-    alerts: document.getElementById("alerts"),
-    stockRows: document.getElementById("stockRows"),
-
-    prepRows: document.getElementById("prepRows"),
-    prepTotal: document.getElementById("prepTotal"),
-    prepMsg: document.getElementById("prepMsg"),
-
-    locBrut: document.getElementById("locBrut"),
-    locMin: document.getElementById("locMin"),
-    trAller: document.getElementById("trAller"),
-    trAR: document.getElementById("trAR"),
-
-    locRows: document.getElementById("locRows"),
-    clearAllBtn: document.getElementById("clearAllBtn"),
+    masseKg: el("masseKg"), typeCamion: el("typeCamion"),
+    dateDebut: el("dateDebut"), dateFin: el("dateFin"),
+    departement: el("departement"), tarifKgJour: el("tarifKgJour"),
+    manutention: el("manutention"), affaire: el("affaire"),
+    kpiDuree: el("kpiDuree"), kpiManutHint: el("kpiManutHint"),
+    kpiTotal: el("kpiTotal"), resume: el("resume"),
+    alerts: el("alerts"), stockRows: el("stockRows"),
+    prepRows: el("prepRows"), prepTotal: el("prepTotal"), prepMsg: el("prepMsg"),
+    locBrut: el("locBrut"), locMin: el("locMin"), trAller: el("trAller"), trAR: el("trAR"),
+    locRows: el("locRows"),
+    saveBtn: el("saveBtn"), resetBtn: el("resetBtn"),
+    clearAllBtn: el("clearAllBtn"),
   };
 
-  // Defaults
+  // defaults
   els.tarifKgJour.value = "0.05";
 
-  // Populate départements
+  // départements
   (function initDepartements(){
     const keys = Object.keys(TARIFS);
     els.departement.innerHTML = `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
   })();
 
-  function getMasseKgNum(){
-    const v = String(els.masseKg.value ?? "").trim().replace(",", ".");
-    if(!v) return null;
-    const n = Number(v);
-    return Number.isFinite(n) && n >= 0 ? n : null;
+  function getNumFromInput(v){
+    const s = String(v ?? "").trim().replace(",", ".");
+    if(!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
   }
 
-  function getTarifNum(){
-    const v = String(els.tarifKgJour.value ?? "").trim().replace(",", ".");
-    if(!v) return null;
-    const n = Number(v);
-    return Number.isFinite(n) && n >= 0 ? n : null;
-  }
-
-  function renderLocationsList(){
-    const locs = loadLocations().slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
-    if(locs.length === 0){
-      els.locRows.innerHTML = `<div class="trow loc"><div class="muted" style="grid-column:1 / span 6">—</div></div>`;
+  function renderLocations(){
+    const rows = [...reservationsCache].sort((a,b)=>String(a.start||"").localeCompare(String(b.start||"")));
+    if(rows.length === 0){
+      els.locRows.innerHTML = `<div class="trow loc"><div class="note" style="grid-column:1/span 6">—</div></div>`;
       return;
     }
-
-    els.locRows.innerHTML = locs.map(l => `
+    els.locRows.innerHTML = rows.map(r => `
       <div class="trow loc">
-        <div class="affaireCell" title="${l.affaire || ""}">${l.affaire || "—"}</div>
-        <div class="dateCell">${fmtDateFR(l.start)}</div>
-        <div class="dateCell">${fmtDateFR(l.end)}</div>
-        <div class="right massCell">${NF(l.masseKg)} kg</div>
-        <div class="right typeCell">${l.typeCamion || "—"}</div>
-        <div class="right">
-          <button class="dangerBtn" data-del="${l.id}" type="button">✕</button>
-        </div>
+        <div class="affaire" title="${(r.affaire||"").replaceAll('"','&quot;')}">${r.affaire || "—"}</div>
+        <div class="dateCell">${fmtDateFR(r.start)}</div>
+        <div class="dateCell">${fmtDateFR(r.end)}</div>
+        <div class="right">${NF0(Number(r.masseKg))} kg</div>
+        <div class="right">${r.typeCamion || "—"}</div>
+        <div class="right"><button class="dangerBtn" data-del="${r.id}">✕</button></div>
       </div>
     `).join("");
 
     els.locRows.querySelectorAll("button[data-del]").forEach(btn=>{
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-del");
-        const next = loadLocations().filter(x => x.id !== id);
-        saveLocations(next);
+        await apiDelete(id);
+        await refreshReservations();
         render();
       });
     });
   }
 
+  async function refreshReservations(){
+    if(!API_URL || API_URL.includes("PASTE_YOUR")) {
+      reservationsCache = [];
+      return;
+    }
+    const data = await apiList();
+    reservationsCache = (data && data.ok && Array.isArray(data.rows)) ? data.rows : [];
+  }
+
   function render(){
-    const masse = getMasseKgNum();
-    const tarif = getTarifNum();
+    const masse = getNumFromInput(els.masseKg.value);
+    const tarif = getNumFromInput(els.tarifKgJour.value);
     const d1 = els.dateDebut.value;
     const d2 = els.dateFin.value;
     const dep = els.departement.value;
     const typeCamion = els.typeCamion.value;
+    const manutSel = els.manutention.value;
 
     const jours = businessDaysInclusive(d1, d2);
-    const manut = requiredHandlingItems(masse);
-    els.kpiManut.textContent = manut.label;
+    els.kpiDuree.textContent = (jours==null) ? "—" : `${jours} j`;
+    els.kpiManutHint.textContent = suggestionManut(masse);
 
-    // Alerts
     const alerts = [];
+    if(API_URL.includes("PASTE_YOUR")) alerts.push({kind:"warn", text:"⚠️ Renseigne API_URL (Apps Script) dans le code pour activer le multi-poste."});
     if(d1 && d2){
       const s = parseDateISO(d1), e = parseDateISO(d2);
       if(s && e && e < s) alerts.push({kind:"warn", text:"La date de fin est avant la date de début."});
     }
-    if(els.masseKg.value && masse == null) alerts.push({kind:"warn", text:"La masse doit être un nombre positif (en kg)."});
-    if(els.tarifKgJour.value && tarif == null) alerts.push({kind:"warn", text:"Le tarif doit être un nombre positif."});
-    if(dep && !TARIFS[dep]) alerts.push({kind:"warn", text:"Département non trouvé dans la grille transport."});
+    if(els.masseKg.value && masse == null) alerts.push({kind:"warn", text:"La masse doit être un nombre (kg)."});
+    if(els.tarifKgJour.value && tarif == null) alerts.push({kind:"warn", text:"Le tarif doit être un nombre."});
 
-    els.alerts.innerHTML = alerts.map(a =>
-      `<div class="${a.kind === "warn" ? "warn" : "good"}" style="margin-bottom:8px">${a.text}</div>`
-    ).join("");
+    els.alerts.innerHTML = alerts.map(a=>`<div class="${a.kind}">${a.text}</div>`).join("");
 
-    // Durée ouvrée
-    els.kpiDuree.textContent = (jours==null) ? "—" : `${jours} j`;
-
-    // Transport
+    // transport
     const trAller = (!dep || !TARIFS[dep]) ? null : (TARIFS[dep][typeCamion] ?? null);
     const trAR = (trAller==null) ? null : trAller * 2;
 
-    // Location
+    // location
     const locBrut = (masse==null || jours==null || tarif==null) ? null : masse * tarif * jours;
-    const locMin = (locBrut==null) ? null : Math.max(MIN_LOCATION, locBrut);
+    const locMin  = (locBrut==null) ? null : Math.max(MIN_LOCATION, locBrut);
 
-    // Total
+    // total
     const total = (locMin==null || trAR==null) ? null : locMin + trAR;
+    els.kpiTotal.textContent = EUR(total);
+    els.locBrut.textContent = EUR(locBrut);
+    els.locMin.textContent = EUR(locMin);
+    els.trAller.textContent = EUR(trAller);
+    els.trAR.textContent = EUR(trAR);
 
-    document.getElementById("locBrut").textContent = EUR(locBrut);
-    document.getElementById("locMin").textContent  = EUR(locMin);
-    document.getElementById("trAller").textContent = EUR(trAller);
-    document.getElementById("trAR").textContent    = EUR(trAR);
-    document.getElementById("kpiTotal").textContent= EUR(total);
+    els.resume.textContent = (total==null)
+      ? "Renseigne masse, dates et département pour obtenir un total."
+      : `Pour ${NF0(masse)} kg sur ${jours} jour(s) ouvré(s) · ${dep} · ${typeCamion} · Tarif ${NF2(tarif)} €/kg/j`;
 
-    // Résumé
-    if(total==null){
-      document.getElementById("resume").textContent = "Renseigne masse, dates et département pour obtenir un total.";
-    } else {
-      document.getElementById("resume").textContent =
-        `Pour ${NF(masse)} kg sur ${jours} jour(s) ouvré(s) en ${dep} (${typeCamion}) · Tarif ${NF2(tarif)} €/kg/j`;
-    }
-
-    // Stock sur période (déduit locations enregistrées)
+    // stock dispo selon période + réservations communes
     const massesDisponibles = getAvailableMasses(d1, d2);
-    els.stockRows.innerHTML = massesDisponibles.map(m => {
+    els.stockRows.innerHTML = massesDisponibles.map(m=>{
       const ok = m.dispoRestante > 0;
       return `
         <div class="trow stock">
           <div>${m.ref}</div>
-          <div class="right">${NF(m.dispo)}</div>
-          <div class="right">${NF(m.reserved)}</div>
-          <div class="right" style="font-weight:950">${NF(m.dispoRestante)}</div>
+          <div class="right">${NF0(m.dispo)}</div>
+          <div class="right">${NF0(m.reserved)}</div>
+          <div class="right" style="font-weight:950">${NF0(m.dispoRestante)}</div>
           <div class="right" style="font-weight:950;color:${ok ? "var(--good)" : "var(--warn)"}">${ok ? "OK" : "0"}</div>
-        </div>
-      `;
+        </div>`;
     }).join("");
 
-    // Décomposition (stock restant + manutention réservée)
+    // manutention (choix manuel)
+    const handlingItems = selectedManutItems(manutSel);
     const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] }
-                              : computeDecomposition(masse, massesDisponibles, manut.items);
+                               : computeDecomposition(masse, massesDisponibles, handlingItems);
 
     const combined = [...(plan.handlingLines||[]), ...(plan.lignes||[])];
     els.prepRows.innerHTML = combined.length === 0
-      ? `<div class="trow prep"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
-      : combined.map(l => `
-          <div class="trow prep">
-            <div>${l.ref}${l.isHandling ? ' <span class="badge" style="margin-left:8px">Manutention</span>' : ""}</div>
-            <div class="right" style="font-weight:950">${NF(l.qte)}</div>
-            <div class="right" style="color:rgba(15,23,42,.70)">${NF(l.poidsKg)} kg</div>
-            <div class="right" style="font-weight:950">${NF(l.sousTotalKg)} kg</div>
-          </div>
-        `).join("");
+      ? `<div class="trow prep"><div class="note" style="grid-column:1/span 4">—</div></div>`
+      : combined.map(l=>`
+        <div class="trow prep">
+          <div>${l.ref}${l.isHandling ? ` <span class="badge">Manutention</span>` : ""}</div>
+          <div class="right" style="font-weight:950">${NF0(l.qte)}</div>
+          <div class="right" style="color:rgba(15,23,42,.7)">${NF0(l.poidsKg)} kg</div>
+          <div class="right" style="font-weight:950">${NF0(l.sousTotalKg)} kg</div>
+        </div>`).join("");
 
-    els.prepTotal.textContent = (masse==null) ? "—" : `${NF(plan.totalKg)} kg`;
+    els.prepTotal.textContent = (masse==null) ? "—" : `${NF0(plan.totalKg)} kg`;
 
     els.prepMsg.innerHTML = "";
     if(masse != null){
-      const delta = plan.totalKg - Math.round(masse);
       let msg = plan.ok
-        ? `<div class="good">Objectif masses atteint. Surplus : ${NF(delta)} kg (stock restant pris en compte).</div>`
-        : `<div class="warn"><b>Attention :</b> stock insuffisant sur ces dates pour atteindre ${NF(masse)} kg (réservations déduites).</div>`;
-
-      if(!plan.handlingOk){
-        msg += `<div class="danger" style="margin-top:8px"><b>Manutention indisponible :</b> timon/châssis requis non disponible sur ces dates.</div>`;
+        ? `<div class="good">Objectif masses atteint (stock période pris en compte).</div>`
+        : `<div class="warn"><b>Attention :</b> stock insuffisant sur ces dates pour atteindre ${NF0(masse)} kg.</div>`;
+      if(Object.keys(handlingItems).length && !plan.handlingOk){
+        msg += `<div class="danger" style="margin-top:8px"><b>Manutention indisponible :</b> l’élément choisi n’est pas disponible sur ces dates.</div>`;
       }
       els.prepMsg.innerHTML = msg;
     }
 
-    renderLocationsList();
+    renderLocations();
   }
 
-  // Valider / enregistrer
-  document.getElementById("saveBtn").addEventListener("click", () => {
-    const affaire = String(document.getElementById("affaire").value || "").trim();
-    const masse = getMasseKgNum();
-    const tarif = getTarifNum();
-    const d1 = document.getElementById("dateDebut").value;
-    const d2 = document.getElementById("dateFin").value;
-    const dep = document.getElementById("departement").value;
-    const typeCamion = document.getElementById("typeCamion").value;
+  // Save / Enregistrer (multi-poste)
+  els.saveBtn.addEventListener("click", async ()=>{
+    const affaire = String(els.affaire.value||"").trim();
+    const masse = getNumFromInput(els.masseKg.value);
+    const tarif = getNumFromInput(els.tarifKgJour.value);
+    const d1 = els.dateDebut.value;
+    const d2 = els.dateFin.value;
+    const dep = els.departement.value;
+    const typeCamion = els.typeCamion.value;
+    const manutSel = els.manutention.value;
 
     const jours = businessDaysInclusive(d1, d2);
 
-    if(!affaire){ alert("Merci de renseigner un N° d’affaire avant de valider."); return; }
-    if(masse == null || tarif == null || !d1 || !d2 || !dep){ alert("Merci de renseigner : masse, dates, département (et un tarif valide)."); return; }
-    if(jours == null){ alert("Dates invalides (fin avant début)."); return; }
+    if(API_URL.includes("PASTE_YOUR")) { alert("Renseigne API_URL (Apps Script) pour activer le multi-poste."); return; }
+    if(!affaire) { alert("N° d’affaire obligatoire."); return; }
+    if(masse==null || tarif==null || !d1 || !d2 || !dep) { alert("Renseigne masse, dates, département et tarif."); return; }
+    if(jours==null) { alert("Dates invalides."); return; }
+
+    await refreshReservations(); // état le plus récent
 
     const massesDisponibles = getAvailableMasses(d1, d2);
-    const manut = requiredHandlingItems(masse);
-    const plan = computeDecomposition(masse, massesDisponibles, manut.items);
+    const handlingItems = selectedManutItems(manutSel);
+    const plan = computeDecomposition(masse, massesDisponibles, handlingItems);
 
-    if(!plan.ok){
-      if(!confirm("Le stock masses semble insuffisant sur ces dates. Enregistrer quand même ?")) return;
-    }
-    if(!plan.handlingOk){
-      if(!confirm("Manutention (timon/châssis) indisponible sur ces dates. Enregistrer quand même ?")) return;
-    }
+    if(!plan.ok && !confirm("Stock masses insuffisant sur ces dates. Enregistrer quand même ?")) return;
+    if(Object.keys(handlingItems).length && !plan.handlingOk && !confirm("Manutention choisie indisponible sur ces dates. Enregistrer quand même ?")) return;
 
     const items = {
       ...linesToItemsMap(plan.handlingLines || []),
       ...linesToItemsMap(plan.lignes || []),
     };
 
-    const locs = loadLocations();
-    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
-    locs.push({
-      id,
-      affaire,
-      start: d1,
-      end: d2,
-      departement: dep,
-      typeCamion,
-      masseKg: Math.round(masse),
-      tarif,
-      joursOuvres: jours,
-      items,
-      createdAt: new Date().toISOString(),
+    const res = await apiCreate({
+      affaire, start:d1, end:d2, departement:dep, typeCamion,
+      masseKg: Math.round(masse), tarif, joursOuvres: jours, items
     });
 
-    saveLocations(locs);
-    document.getElementById("affaire").value = "";
+    if(!res || !res.ok){ alert("Erreur enregistrement : " + (res?.error || "inconnue")); return; }
+
+    els.affaire.value = "";
+    await refreshReservations();
     render();
-    alert("Location enregistrée ✅ Stock mis à jour.");
+    alert("Réservation enregistrée (multi-poste) ✅");
   });
 
-  // Tout effacer
-  document.getElementById("clearAllBtn").addEventListener("click", () => {
-    if(confirm("Supprimer TOUTES les locations enregistrées sur ce poste ?")) {
-      localStorage.removeItem(STORAGE_KEY);
-      render();
-    }
-  });
-
-  // Reset
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    document.getElementById("masseKg").value = "";
-    document.getElementById("dateDebut").value = "";
-    document.getElementById("dateFin").value = "";
-    document.getElementById("departement").value = "";
-    document.getElementById("typeCamion").value = "Complet";
-    document.getElementById("tarifKgJour").value = "0.05";
-    document.getElementById("affaire").value = "";
+  els.clearAllBtn.addEventListener("click", async ()=>{
+    if(API_URL.includes("PASTE_YOUR")) { alert("Renseigne API_URL (Apps Script)."); return; }
+    if(!confirm("Supprimer TOUTES les réservations (base partagée) ?")) return;
+    await apiClear();
+    await refreshReservations();
     render();
   });
 
-  // Re-render on input
+  els.resetBtn.addEventListener("click", ()=>{
+    els.masseKg.value=""; els.dateDebut.value=""; els.dateFin.value="";
+    els.departement.value=""; els.typeCamion.value="Complet";
+    els.tarifKgJour.value="0.05"; els.affaire.value=""; els.manutention.value="sans";
+    render();
+  });
+
   ["input","change"].forEach(evt=>{
-    document.getElementById("masseKg").addEventListener(evt,render);
-    document.getElementById("tarifKgJour").addEventListener(evt,render);
-    document.getElementById("dateDebut").addEventListener(evt,render);
-    document.getElementById("dateFin").addEventListener(evt,render);
-    document.getElementById("departement").addEventListener(evt,render);
-    document.getElementById("typeCamion").addEventListener(evt,render);
+    ["masseKg","dateDebut","dateFin","departement","typeCamion","tarifKgJour","manutention"].forEach(id=>{
+      el(id).addEventListener(evt, render);
+    });
   });
 
-  // Init départements + defaults
-  (function init(){
-    const keys = Object.keys(TARIFS);
-    document.getElementById("departement").innerHTML =
-      `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
-    document.getElementById("tarifKgJour").value = "0.05";
+  // init
+  (async function(){
+    await refreshReservations();
     render();
   })();
 </script>
-</body>
-</html>
-
 </body>
 </html>
