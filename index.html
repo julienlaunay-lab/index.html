@@ -32,7 +32,7 @@
     .layout{display:grid;grid-template-columns:1fr;gap:14px}
     @media(min-width:1200px){
       .layout{
-        grid-template-columns: 360px minmax(520px, 1fr) 420px;
+        grid-template-columns: 360px minmax(520px, 1fr) 520px;
         align-items:start;
       }
     }
@@ -75,8 +75,10 @@
 
     .thead.stock,.trow.stock{grid-template-columns: 5fr 2fr 2fr 2fr 1fr}
     .thead.prep,.trow.prep{grid-template-columns: 6fr 2fr 2fr 2fr}
+
+    /* Réservations : + colonnes Edit / Dupl */
     .thead.loc,.trow.loc{
-      grid-template-columns: 2.2fr 1.3fr 1.3fr 1.2fr 1fr 46px;
+      grid-template-columns: 2.2fr 1.3fr 1.3fr 1.2fr 1fr 46px 60px 80px;
       gap:8px;
     }
 
@@ -106,13 +108,13 @@
     /* --- Sticky réservations à droite --- */
     .sticky{position:sticky; top:14px}
 
-    /* --- IMPORTANT : Résultats visibles sans scroller la page --- */
+    /* --- Résultats visibles sans scroller la page --- */
     @media(min-width:1200px){
       .resultPanel{
         position: sticky;
         top: 14px;
-        max-height: calc(100vh - 28px); /* hauteur écran */
-        overflow: auto;                 /* scroll interne */
+        max-height: calc(100vh - 28px);
+        overflow: auto;
         padding-right: 6px;
       }
       .resultPanel::-webkit-scrollbar{ width:10px; }
@@ -125,7 +127,7 @@
 
     /* --- Scroll interne réservations --- */
     .scrollBox{
-      max-height: calc(100vh - 170px);
+      max-height: calc(100vh - 210px);
       overflow:auto;
     }
     .scrollBox::-webkit-scrollbar{ width:10px; }
@@ -141,7 +143,6 @@
     .massCell{white-space:nowrap}
     .typeCell{white-space:nowrap}
 
-    /* Petites améliorations visuelles */
     .sectionTitle{font-weight:900;margin-bottom:8px}
     .sectionTitle small{font-weight:600;color:var(--muted)}
   </style>
@@ -195,6 +196,25 @@
           </div>
         </div>
 
+        <!-- NOUVEAU : Manutention + commentaire -->
+        <div class="row two" style="margin-top:10px">
+          <div>
+            <label for="manutMode">Manutention (timon / châssis)</label>
+            <select id="manutMode">
+              <option value="auto" selected>Auto (selon masse)</option>
+              <option value="sans">Sans</option>
+              <option value="petit">Petit timon (10t)</option>
+              <option value="grand">Grand timon (20t)</option>
+              <option value="chassis_grand">Châssis + grand timon</option>
+              <option value="chassis_seul">Châssis seul</option>
+            </select>
+          </div>
+          <div>
+            <label for="commentaire">Commentaire (optionnel)</label>
+            <input id="commentaire" placeholder="Ex : accès chantier, contact, contrainte..." />
+          </div>
+        </div>
+
         <div class="sep"></div>
 
         <div class="row">
@@ -216,9 +236,9 @@
             <div class="note">forfait mini</div>
           </div>
           <div class="kpi">
-            <div class="t">Manutention (auto)</div>
+            <div class="t">Manutention</div>
             <div class="v"><span class="badge" id="kpiManut">—</span></div>
-            <div class="note">≤10t / 10–20t / >20t</div>
+            <div class="note">Auto / Sans / choix manuel</div>
           </div>
         </div>
 
@@ -234,7 +254,7 @@
         </div>
       </div>
 
-      <!-- RESULTATS (sticky + scroll interne) -->
+      <!-- RESULTATS -->
       <div class="card resultPanel">
         <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-end;flex-wrap:wrap">
           <div>
@@ -267,7 +287,7 @@
         <div class="sep"></div>
 
         <div style="margin-top:12px">
-          <div class="sectionTitle">Préparation <small>(décomposition + manutention auto)</small></div>
+          <div class="sectionTitle">Préparation <small>(décomposition + manutention)</small></div>
           <div class="table" id="prepTable">
             <div class="thead prep">
               <div>Type de masse</div>
@@ -286,7 +306,6 @@
 
         <div class="sep"></div>
 
-        <!-- ICI : la partie que tu ne voyais pas => maintenant accessible via scroll interne du panneau -->
         <div class="row">
           <div class="kpi">
             <div class="t">Location (brut)</div>
@@ -312,18 +331,23 @@
         <div class="sep"></div>
 
         <div class="note">
-          Astuce : sur PC, ce panneau “Résultats” reste visible et scrolle dans lui-même (pas besoin de scroller la page).
+          Astuce : sur PC, ce panneau “Résultats” reste visible et scrolle dans lui-même.
         </div>
       </div>
 
-      <!-- RESERVATIONS (sticky + dates compactes) -->
+      <!-- RESERVATIONS -->
       <div class="card sticky">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
           <div>
             <div style="font-weight:900">Locations enregistrées</div>
             <div class="note">Toujours visible · scroll dans la liste</div>
           </div>
-          <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+            <button id="exportBtn" type="button">Exporter</button>
+            <button id="importBtn" type="button">Importer</button>
+            <input id="importFile" type="file" accept="application/json" style="display:none" />
+            <button id="clearAllBtn" type="button" class="dangerBtn">Tout effacer</button>
+          </div>
         </div>
 
         <div class="sep"></div>
@@ -337,13 +361,15 @@
               <div class="right">Masse</div>
               <div class="right">Type</div>
               <div class="right">Suppr.</div>
+              <div class="right">Edit</div>
+              <div class="right">Dupl.</div>
             </div>
             <div id="locRows"></div>
           </div>
         </div>
 
         <div class="note" style="margin-top:10px">
-          Les dates sont affichées en format JJ/MM/AAAA pour une lecture plus rapide.
+          Export/Import (Option 1) : pour partager entre postes, exporte un fichier JSON et importe-le sur un autre PC.
         </div>
       </div>
 
@@ -355,7 +381,7 @@
   const STORAGE_KEY = "masses_locations_v1";
   const MIN_LOCATION = 250;
 
-  // Stock (issu de ton XLS) : poids unitaires (kg) + quantité totale
+  // Stock : poids unitaires (kg) + quantité totale
   const MASSES = [
     { ref: "orange", poidsKg: 2500, dispo: 8 },
     { ref: "jaune", poidsKg: 2000, dispo: 1 },
@@ -424,7 +450,6 @@
   }
 
   function fmtDateFR(iso){
-    // iso yyyy-mm-dd -> dd/mm/yyyy
     const d = parseDateISO(iso);
     if(!d) return "—";
     const dd = String(d.getUTCDate()).padStart(2,"0");
@@ -437,7 +462,6 @@
     return !(aEnd < bStart || aStart > bEnd); // inclusif
   }
 
-  // Jours ouvrés (week-end exclu)
   function businessDaysInclusive(startIso, endIso){
     const s = parseDateISO(startIso);
     const e = parseDateISO(endIso);
@@ -454,19 +478,38 @@
     return Math.max(1, count);
   }
 
-  // Manutention auto selon masse
-  function requiredHandlingItems(masseKg){
-    if(masseKg == null) return { label: "—", items:{} };
-    const t = masseKg / 1000;
-    if(t <= 10){
-      return { label: "≤10t : petit timon (10t)", items: { "petit timon": 1 } };
+  function mergeItemsMaps(...maps){
+    const out = {};
+    for(const m of maps){
+      for(const [k,v] of Object.entries(m || {})){
+        out[k] = (out[k] || 0) + (Number(v) || 0);
+      }
     }
-    if(t <= 20){
-      return { label: "10–20t : grand timon (20t)", items: { "grand timon": 1 } };
-    }
-    return { label: ">20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
+    return out;
   }
 
+  // ======= MANUTENTION : Auto + Manuel + Sans =======
+  function requiredHandlingItemsAuto(masseKg){
+    if(masseKg == null) return { label: "—", items:{} };
+    const t = masseKg / 1000;
+    if(t <= 10) return { label: "Auto ≤10t : petit timon (10t)", items: { "petit timon": 1 } };
+    if(t <= 20) return { label: "Auto 10–20t : grand timon (20t)", items: { "grand timon": 1 } };
+    return { label: "Auto >20t : châssis + grand timon", items: { "châssis (chaîne incluse)": 1, "grand timon": 1 } };
+  }
+
+  function getHandlingSelection(masseKg){
+    const mode = (els.manutMode?.value || "auto");
+    if(mode === "sans") return { label: "Sans manutention", items:{} };
+
+    if(mode === "petit") return { label: "Petit timon (10t)", items:{ "petit timon": 1 } };
+    if(mode === "grand") return { label: "Grand timon (20t)", items:{ "grand timon": 1 } };
+    if(mode === "chassis_grand") return { label: "Châssis + grand timon", items:{ "châssis (chaîne incluse)": 1, "grand timon": 1 } };
+    if(mode === "chassis_seul") return { label: "Châssis seul", items:{ "châssis (chaîne incluse)": 1 } };
+
+    return requiredHandlingItemsAuto(masseKg);
+  }
+
+  // ======= STOCK DISPO =======
   function getReservedMap(startIso, endIso){
     const s = parseDateISO(startIso);
     const e = parseDateISO(endIso);
@@ -586,6 +629,8 @@
     typeCamion: document.getElementById("typeCamion"),
     tarifKgJour: document.getElementById("tarifKgJour"),
     affaire: document.getElementById("affaire"),
+    manutMode: document.getElementById("manutMode"),
+    commentaire: document.getElementById("commentaire"),
 
     resetBtn: document.getElementById("resetBtn"),
     saveBtn: document.getElementById("saveBtn"),
@@ -609,22 +654,23 @@
 
     locRows: document.getElementById("locRows"),
     clearAllBtn: document.getElementById("clearAllBtn"),
+
+    exportBtn: document.getElementById("exportBtn"),
+    importBtn: document.getElementById("importBtn"),
+    importFile: document.getElementById("importFile"),
   };
 
-  // Defaults
-  els.tarifKgJour.value = "0.05";
-
-  // Populate départements
-  (function initDepartements(){
-    const keys = Object.keys(TARIFS);
-    els.departement.innerHTML = `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
-  })();
+  // Etat d’édition
+  let editingId = null;
+  function setSaveMode(isEdit){
+    els.saveBtn.textContent = isEdit ? "Mettre à jour" : "Valider / enregistrer";
+  }
 
   function getMasseKgNum(){
     const v = String(els.masseKg.value ?? "").trim().replace(",", ".");
     if(!v) return null;
     const n = Number(v);
-    return Number.isFinite(n) && n >= 0 ? n : null;
+    return Number.isFinite(n) && n > 0 ? n : null; // masse > 0
   }
 
   function getTarifNum(){
@@ -635,9 +681,12 @@
   }
 
   function renderLocationsList(){
-    const locs = loadLocations().slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+    const locs = loadLocations()
+      .slice()
+      .sort((a,b)=> (parseDateISO(a.start)?.getTime()||0) - (parseDateISO(b.start)?.getTime()||0));
+
     if(locs.length === 0){
-      els.locRows.innerHTML = `<div class="trow loc"><div class="muted" style="grid-column:1 / span 6">—</div></div>`;
+      els.locRows.innerHTML = `<div class="trow loc"><div class="muted" style="grid-column:1 / span 8">—</div></div>`;
       return;
     }
 
@@ -648,18 +697,79 @@
         <div class="dateCell">${fmtDateFR(l.end)}</div>
         <div class="right massCell">${NF(l.masseKg)} kg</div>
         <div class="right typeCell">${l.typeCamion || "—"}</div>
+
         <div class="right">
           <button class="dangerBtn" data-del="${l.id}" type="button">✕</button>
+        </div>
+        <div class="right">
+          <button data-edit="${l.id}" type="button" title="Modifier">✎</button>
+        </div>
+        <div class="right">
+          <button data-dup="${l.id}" type="button" title="Dupliquer">⎘</button>
         </div>
       </div>
     `).join("");
 
+    // Supprimer
     els.locRows.querySelectorAll("button[data-del]").forEach(btn=>{
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-del");
         const next = loadLocations().filter(x => x.id !== id);
         saveLocations(next);
+        // si on supprimait l’item en cours d’édition
+        if(editingId === id){
+          editingId = null;
+          setSaveMode(false);
+        }
         render();
+      });
+    });
+
+    // Editer
+    els.locRows.querySelectorAll("button[data-edit]").forEach(btn=>{
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-edit");
+        const loc = loadLocations().find(x => x.id === id);
+        if(!loc) return;
+
+        editingId = id;
+        els.affaire.value = loc.affaire || "";
+        els.masseKg.value = loc.masseKg ?? "";
+        els.dateDebut.value = loc.start || "";
+        els.dateFin.value = loc.end || "";
+        els.departement.value = loc.departement || "";
+        els.typeCamion.value = loc.typeCamion || "Complet";
+        els.tarifKgJour.value = (loc.tarif ?? "0.05");
+        els.manutMode.value = loc.manutMode || "auto";
+        els.commentaire.value = loc.commentaire || "";
+
+        setSaveMode(true);
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    // Dupliquer
+    els.locRows.querySelectorAll("button[data-dup]").forEach(btn=>{
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-dup");
+        const loc = loadLocations().find(x => x.id === id);
+        if(!loc) return;
+
+        editingId = null;
+        els.affaire.value = (loc.affaire || "") + " (copie)";
+        els.masseKg.value = loc.masseKg ?? "";
+        els.dateDebut.value = loc.start || "";
+        els.dateFin.value = loc.end || "";
+        els.departement.value = loc.departement || "";
+        els.typeCamion.value = loc.typeCamion || "Complet";
+        els.tarifKgJour.value = (loc.tarif ?? "0.05");
+        els.manutMode.value = loc.manutMode || "auto";
+        els.commentaire.value = loc.commentaire || "";
+
+        setSaveMode(false);
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     });
   }
@@ -673,7 +783,7 @@
     const typeCamion = els.typeCamion.value;
 
     const jours = businessDaysInclusive(d1, d2);
-    const manut = requiredHandlingItems(masse);
+    const manut = getHandlingSelection(masse);
     els.kpiManut.textContent = manut.label;
 
     // Alerts
@@ -682,7 +792,7 @@
       const s = parseDateISO(d1), e = parseDateISO(d2);
       if(s && e && e < s) alerts.push({kind:"warn", text:"La date de fin est avant la date de début."});
     }
-    if(els.masseKg.value && masse == null) alerts.push({kind:"warn", text:"La masse doit être un nombre positif (en kg)."});
+    if(els.masseKg.value && masse == null) alerts.push({kind:"warn", text:"La masse doit être un nombre positif (en kg)."}); // masse >0
     if(els.tarifKgJour.value && tarif == null) alerts.push({kind:"warn", text:"Le tarif doit être un nombre positif."});
     if(dep && !TARIFS[dep]) alerts.push({kind:"warn", text:"Département non trouvé dans la grille transport."});
 
@@ -704,22 +814,28 @@
     // Total
     const total = (locMin==null || trAR==null) ? null : locMin + trAR;
 
-    document.getElementById("locBrut").textContent = EUR(locBrut);
-    document.getElementById("locMin").textContent  = EUR(locMin);
-    document.getElementById("trAller").textContent = EUR(trAller);
-    document.getElementById("trAR").textContent    = EUR(trAR);
-    document.getElementById("kpiTotal").textContent= EUR(total);
+    els.locBrut.textContent = EUR(locBrut);
+    els.locMin.textContent  = EUR(locMin);
+    els.trAller.textContent = EUR(trAller);
+    els.trAR.textContent    = EUR(trAR);
+    els.kpiTotal.textContent= EUR(total);
 
     // Résumé
     if(total==null){
-      document.getElementById("resume").textContent = "Renseigne masse, dates et département pour obtenir un total.";
+      els.resume.textContent = "Renseigne masse, dates et département pour obtenir un total.";
     } else {
-      document.getElementById("resume").textContent =
+      els.resume.textContent =
         `Pour ${NF(masse)} kg sur ${jours} jour(s) ouvré(s) en ${dep} (${typeCamion}) · Tarif ${NF2(tarif)} €/kg/j`;
     }
 
     // Stock sur période (déduit locations enregistrées)
     const massesDisponibles = getAvailableMasses(d1, d2);
+
+    // Décomposition (stock restant + manutention réservée)
+    const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] }
+                              : computeDecomposition(masse, massesDisponibles, manut.items);
+
+    // StockRows
     els.stockRows.innerHTML = massesDisponibles.map(m => {
       const ok = m.dispoRestante > 0;
       return `
@@ -733,10 +849,7 @@
       `;
     }).join("");
 
-    // Décomposition (stock restant + manutention réservée)
-    const plan = (masse==null) ? { lignes:[], totalKg:0, ok:false, handlingOk:true, handlingLines:[] }
-                              : computeDecomposition(masse, massesDisponibles, manut.items);
-
+    // Préparation
     const combined = [...(plan.handlingLines||[]), ...(plan.lignes||[])];
     els.prepRows.innerHTML = combined.length === 0
       ? `<div class="trow prep"><div class="muted" style="grid-column:1 / span 4">—</div></div>`
@@ -767,24 +880,62 @@
     renderLocationsList();
   }
 
-  // Valider / enregistrer
-  document.getElementById("saveBtn").addEventListener("click", () => {
-    const affaire = String(document.getElementById("affaire").value || "").trim();
+  // ======= EXPORT / IMPORT (Option 1) =======
+  els.exportBtn.addEventListener("click", () => {
+    const data = { version: 1, exportedAt: new Date().toISOString(), locations: loadLocations() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `reservations-masses-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  els.importBtn.addEventListener("click", () => {
+    els.importFile.click();
+  });
+
+  els.importFile.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const incoming = Array.isArray(parsed?.locations) ? parsed.locations : [];
+      const current = loadLocations();
+      const map = new Map(current.map(x => [x.id, x]));
+      for(const r of incoming){
+        if(r?.id) map.set(r.id, r); // import écrase par id
+      }
+      saveLocations([...map.values()]);
+      render();
+      alert("Import terminé ✅");
+    } catch(err){
+      console.error(err);
+      alert("Fichier JSON invalide.");
+    } finally {
+      e.target.value = "";
+    }
+  });
+
+  // ======= Valider / enregistrer / mettre à jour =======
+  els.saveBtn.addEventListener("click", () => {
+    const affaire = String(els.affaire.value || "").trim();
     const masse = getMasseKgNum();
     const tarif = getTarifNum();
-    const d1 = document.getElementById("dateDebut").value;
-    const d2 = document.getElementById("dateFin").value;
-    const dep = document.getElementById("departement").value;
-    const typeCamion = document.getElementById("typeCamion").value;
+    const d1 = els.dateDebut.value;
+    const d2 = els.dateFin.value;
+    const dep = els.departement.value;
+    const typeCamion = els.typeCamion.value;
 
     const jours = businessDaysInclusive(d1, d2);
 
     if(!affaire){ alert("Merci de renseigner un N° d’affaire avant de valider."); return; }
-    if(masse == null || tarif == null || !d1 || !d2 || !dep){ alert("Merci de renseigner : masse, dates, département (et un tarif valide)."); return; }
+    if(masse == null || tarif == null || !d1 || !d2 || !dep){ alert("Merci de renseigner : masse (>0), dates, département (et un tarif valide)."); return; }
     if(jours == null){ alert("Dates invalides (fin avant début)."); return; }
 
     const massesDisponibles = getAvailableMasses(d1, d2);
-    const manut = requiredHandlingItems(masse);
+    const manut = getHandlingSelection(masse);
     const plan = computeDecomposition(masse, massesDisponibles, manut.items);
 
     if(!plan.ok){
@@ -794,16 +945,18 @@
       if(!confirm("Manutention (timon/châssis) indisponible sur ces dates. Enregistrer quand même ?")) return;
     }
 
-    const items = {
-      ...linesToItemsMap(plan.handlingLines || []),
-      ...linesToItemsMap(plan.lignes || []),
-    };
+    const items = mergeItemsMaps(
+      linesToItemsMap(plan.handlingLines || []),
+      linesToItemsMap(plan.lignes || [])
+    );
 
-    const locs = loadLocations();
-    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const manutMode = els.manutMode.value || "auto";
+    const commentaire = String(els.commentaire.value || "").trim();
 
-    locs.push({
-      id,
+    let locs = loadLocations();
+
+    const payload = {
+      id: editingId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       affaire,
       start: d1,
       end: d2,
@@ -812,55 +965,77 @@
       masseKg: Math.round(masse),
       tarif,
       joursOuvres: jours,
+      manutMode,
+      commentaire,
       items,
-      createdAt: new Date().toISOString(),
-    });
+      updatedAt: new Date().toISOString(),
+      createdAt: editingId ? (locs.find(x=>x.id===editingId)?.createdAt || new Date().toISOString())
+                          : new Date().toISOString(),
+    };
+
+    if(editingId){
+      locs = locs.map(x => x.id === editingId ? payload : x);
+      editingId = null;
+      setSaveMode(false);
+      alert("Réservation mise à jour ✅");
+    } else {
+      locs.push(payload);
+      alert("Location enregistrée ✅ Stock mis à jour.");
+    }
 
     saveLocations(locs);
-    document.getElementById("affaire").value = "";
+    els.affaire.value = "";
+    els.commentaire.value = "";
     render();
-    alert("Location enregistrée ✅ Stock mis à jour.");
   });
 
-  // Tout effacer
-  document.getElementById("clearAllBtn").addEventListener("click", () => {
+  // ======= Tout effacer =======
+  els.clearAllBtn.addEventListener("click", () => {
     if(confirm("Supprimer TOUTES les locations enregistrées sur ce poste ?")) {
       localStorage.removeItem(STORAGE_KEY);
+      editingId = null;
+      setSaveMode(false);
       render();
     }
   });
 
-  // Reset
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    document.getElementById("masseKg").value = "";
-    document.getElementById("dateDebut").value = "";
-    document.getElementById("dateFin").value = "";
-    document.getElementById("departement").value = "";
-    document.getElementById("typeCamion").value = "Complet";
-    document.getElementById("tarifKgJour").value = "0.05";
-    document.getElementById("affaire").value = "";
+  // ======= Reset =======
+  els.resetBtn.addEventListener("click", () => {
+    els.masseKg.value = "";
+    els.dateDebut.value = "";
+    els.dateFin.value = "";
+    els.departement.value = "";
+    els.typeCamion.value = "Complet";
+    els.tarifKgJour.value = "0.05";
+    els.manutMode.value = "auto";
+    els.commentaire.value = "";
+    els.affaire.value = "";
+    editingId = null;
+    setSaveMode(false);
     render();
   });
 
-  // Re-render on input
+  // ======= Re-render on input =======
   ["input","change"].forEach(evt=>{
-    document.getElementById("masseKg").addEventListener(evt,render);
-    document.getElementById("tarifKgJour").addEventListener(evt,render);
-    document.getElementById("dateDebut").addEventListener(evt,render);
-    document.getElementById("dateFin").addEventListener(evt,render);
-    document.getElementById("departement").addEventListener(evt,render);
-    document.getElementById("typeCamion").addEventListener(evt,render);
+    els.masseKg.addEventListener(evt,render);
+    els.tarifKgJour.addEventListener(evt,render);
+    els.dateDebut.addEventListener(evt,render);
+    els.dateFin.addEventListener(evt,render);
+    els.departement.addEventListener(evt,render);
+    els.typeCamion.addEventListener(evt,render);
+    els.manutMode.addEventListener(evt,render);
   });
 
-  // Init départements + defaults
+  // ======= Init =======
   (function init(){
     const keys = Object.keys(TARIFS);
-    document.getElementById("departement").innerHTML =
+    els.departement.innerHTML =
       `<option value="">— Choisir —</option>` + keys.map(k => `<option value="${k}">${k}</option>`).join("");
-    document.getElementById("tarifKgJour").value = "0.05";
+    els.tarifKgJour.value = "0.05";
+    els.manutMode.value = "auto";
+    setSaveMode(false);
     render();
   })();
 </script>
 </body>
 </html>
-
